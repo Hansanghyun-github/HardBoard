@@ -40,3 +40,14 @@
 
 글에 이미지 올리면 어디에 저장해야되지?
 
+---
+
+신고하다
+
+notify -> report
+
+비추천하다
+
+not_recommend -> unrecommend
+
+아이디 엔티티 제거 - 이메일을 아이디로 사용
