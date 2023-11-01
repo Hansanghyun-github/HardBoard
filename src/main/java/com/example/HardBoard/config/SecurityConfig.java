@@ -17,23 +17,15 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeRequests(auth -> auth
-                .antMatchers("/public/**")
+                .antMatchers("/public/**", "/auth/**")
                 .permitAll()
-                .antMatchers("/users/**")
-                .authenticated()
-                .antMatchers("blocks/**")
-                .authenticated()
-                .antMatchers("/posts/**")
-                .authenticated()
-                .antMatchers("/comments/**")
-                .authenticated()
-                .antMatchers("/notices/**")
-                .authenticated()
-                .antMatchers("/inquiries/**")
-                .authenticated()
-                .antMatchers("/reports/**")
+                .antMatchers(
+                        "/users/**", "/blocks/**",
+                        "/posts/**", "/comments/**",
+                        "/notices/**", "/inquiries/**", "/reports/**")
                 .authenticated()
                 .antMatchers("/admin/**")
                 .hasAuthority("ROLE_ADMIN"));
+        return http.build();
     }
 }
