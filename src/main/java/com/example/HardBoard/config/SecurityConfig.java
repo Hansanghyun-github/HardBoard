@@ -1,4 +1,4 @@
-package com.example.HardBoard;
+package com.example.HardBoard.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ public class SecurityConfig {
                 .antMatchers(
                         "/users/**", "/blocks/**",
                         "/posts/**", "/comments/**",
-                        "/notices/**", "/inquiries/**", "/reports/**")
+                        "/inquiries/**", "/reports/**")
                 .authenticated()
-                .antMatchers("/admin/**")
+                .antMatchers("/admin/**", "/notices/**")
                 .hasAuthority("ROLE_ADMIN"));
         return http.build();
     }
