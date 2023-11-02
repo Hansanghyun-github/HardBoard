@@ -1,4 +1,4 @@
-package com.example.HardBoard.config;
+package com.example.HardBoard.auth.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

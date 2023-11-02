@@ -1,6 +1,6 @@
-package com.example.HardBoard.notice;
+package com.example.HardBoard.api.controller.notice;
 
-import com.example.HardBoard.dto.NoticeDto;
+import com.example.HardBoard.api.service.notice.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

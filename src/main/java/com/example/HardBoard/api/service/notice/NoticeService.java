@@ -1,5 +1,7 @@
-package com.example.HardBoard.notice;
+package com.example.HardBoard.api.service.notice;
 
+import com.example.HardBoard.domain.notice.Notice;
+import com.example.HardBoard.domain.notice.NoticeRepository;
 import com.example.HardBoard.dto.NoticeDto;
 import com.example.HardBoard.exception.InvalidIdException;
 import lombok.RequiredArgsConstructor;

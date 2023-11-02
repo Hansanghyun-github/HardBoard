@@ -1,5 +1,6 @@
-package com.example.HardBoard.notice;
+package com.example.HardBoard.domain.notice;
 
+import com.example.HardBoard.domain.notice.Notice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

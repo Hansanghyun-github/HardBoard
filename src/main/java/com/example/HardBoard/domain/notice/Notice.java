@@ -1,4 +1,4 @@
-package com.example.HardBoard.notice;
+package com.example.HardBoard.domain.notice;
 
 import lombok.Getter;
 import lombok.Setter;
