@@ -1,9 +1,9 @@
 ### 프로젝트 구조
 
 api
+- ControllerAdvice.java
+- ApiResponse.java // ControllerAdvice에서 사용하는 response
 - controller
-  - ControllerAdvice.java
-  - ApiResponse.java // ControllerAdvice에서 사용하는 response
   - domain1
     - Domain1Controller.java
     - request
