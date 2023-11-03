@@ -1,6 +1,9 @@
 package com.example.HardBoard.api.controller.notice;
 
+import com.example.HardBoard.api.ApiResponse;
+import com.example.HardBoard.api.controller.notice.request.NoticeCreateRequest;
 import com.example.HardBoard.api.service.notice.NoticeService;
+import com.example.HardBoard.api.service.notice.response.NoticeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -13,27 +16,26 @@ public class NoticeController {
 
     final private NoticeService noticeService;
     @PostMapping
-    public String createNotice(
-            @RequestBody NoticeDto noticeDto
-    ){
-        //TODO
-        return "ok";
+    public ApiResponse<NoticeResponse> createNotice(
+            @RequestBody NoticeCreateRequest request
+            ){
+        return ApiResponse.ok(noticeService.createNotice(request.toServiceCreate()));
     }
 
     @PutMapping("/{noticeId}")
-    public String editNotice(
+    public ApiResponse<String> editNotice(
             @RequestParam Long noticeId,
-            @RequestBody NoticeDto noticeDto
+            @RequestBody NoticeCreateRequest request
     ){
-        //TODO
-        return "ok";
+        noticeService.editNotice(noticeId, request.toServiceCreate());
+        return ApiResponse.ok("ok");
     }
 
     @DeleteMapping("/{noticeId}")
-    public String deleteNotice(
+    public ApiResponse<String> deleteNotice(
             @RequestParam Long noticeId
     ){
-        //TODO
-        return "ok";
+        noticeService.deleteNotice(noticeId);
+        return ApiResponse.ok("ok");
     }
 }

@@ -1,8 +1,7 @@
 package com.example.HardBoard.domain.notice;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.example.HardBoard.domain.BaseEntity;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,7 +9,8 @@ import javax.persistence.*;
 @Table(name = "notices")
 @Getter @Setter
 @ToString
-public class Notice {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Notice extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "notice_id")
@@ -20,9 +20,16 @@ public class Notice {
 
     private String contents;
 
-    @Column(name = "created_at")
-    private String createdAt;
+    @Builder
+    private Notice(String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
 
-    @Column(name = "updated_at")
-    private String updatedAt;
+    public static Notice create(String title, String contents){
+        return Notice.builder()
+                .title(title)
+                .contents(contents)
+                .build();
+    }
 }
