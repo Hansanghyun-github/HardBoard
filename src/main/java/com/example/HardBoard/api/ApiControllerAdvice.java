@@ -1,5 +1,6 @@
 package com.example.HardBoard.api;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +20,7 @@ public class ApiControllerAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler({IllegalArgumentException.class, EmptyResultDataAccessException.class})
     public ApiResponse<Object> illegalArgumentException(IllegalArgumentException e){
         return ApiResponse.of(
                 HttpStatus.BAD_REQUEST,

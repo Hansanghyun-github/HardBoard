@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -67,6 +68,21 @@ class NoticeServiceTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 Notice를 수정하면 실패한다")
+    void editNullNoticeBeError() throws Exception {
+        // given
+        NoticeEditServiceRequest request = NoticeEditServiceRequest.builder()
+                .title("title1")
+                .contents("contents1")
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> noticeService.editNotice(9L, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid Id");
+    }
+
+    @Test
     @DisplayName("Notice 객체를 삭제한다")
     void deleteNotice() throws Exception {
         // given
@@ -83,6 +99,15 @@ class NoticeServiceTest {
         assertThatThrownBy(() -> noticeService.findById(notice.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid Id");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 Notice를 삭제하는 요청을 보내면 실패한다")
+    void deleteNullNoticeBeError() throws Exception {
+        // when // then
+        assertThatThrownBy(() -> noticeService.deleteNotice(9L))
+                .isInstanceOf(EmptyResultDataAccessException.class);
+
     }
 
     // TODO title, contents 길이 제한 테스트

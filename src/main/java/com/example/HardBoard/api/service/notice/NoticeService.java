@@ -28,10 +28,9 @@ public class NoticeService {
     }
 
     public void editNotice(Long noticeId, NoticeEditServiceRequest request){
-        Optional<Notice> optionalNotice = noticeRepository.findById(noticeId);
-        if(optionalNotice.isEmpty()) throw new IllegalArgumentException("Invalid Id");
-
-        Notice notice = optionalNotice.get();
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() ->
+                new IllegalArgumentException("Invalid Id"));
         notice.setTitle(request.getTitle());
         notice.setContents(request.getContents());
     }
@@ -41,9 +40,8 @@ public class NoticeService {
     }
 
     public NoticeResponse findById(Long noticeId) {
-        // TODO change Optional default method
-        Optional<Notice> notice = noticeRepository.findById(noticeId);
-        if(notice.isEmpty()) throw new IllegalArgumentException("Invalid Id");
-        return NoticeResponse.of(notice.get());
+        return NoticeResponse.of(noticeRepository.findById(noticeId)
+                .orElseThrow(() ->
+                new IllegalArgumentException("Invalid Id")));
     }
 }
