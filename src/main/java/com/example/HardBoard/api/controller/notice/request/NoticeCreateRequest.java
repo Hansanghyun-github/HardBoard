@@ -10,9 +10,9 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @NoArgsConstructor
 public class NoticeCreateRequest {
-    @NotBlank
+    @NotBlank(message = "제목은 필수 입니다")
     private String title;
-    @NotBlank
+    @NotBlank(message = "내용은 필수 입니다")
     private String contents;
 
     @Builder
