@@ -37,8 +37,8 @@ public class RefreshToken {
         this.expirationDate = expirationDate;
     }
 
-    public void refreshTokenRotation(){
+    public void refreshTokenRotation(LocalDateTime dateTime){
         this.refreshToken = UUID.randomUUID().toString();
-        this.expirationDate = LocalDateTime.now().plusSeconds((JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
+        this.expirationDate = dateTime.plusSeconds((JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
     }
 }

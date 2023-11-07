@@ -26,12 +26,13 @@ class RefreshTokenTest {
                 .user(token.getUser())
                 .expirationDate(token.getExpirationDate())
                 .build();
+        LocalDateTime dateTime = LocalDateTime.now();
 
         // when
-        token.refreshTokenRotation();
+        token.refreshTokenRotation(dateTime);
 
         // then
         assertThat(token.getRefreshToken()).isNotEqualTo(prevToken.getRefreshToken());
-        assertThat(token.getExpirationDate()).isEqualTo(prevToken.getExpirationDate().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
+        assertThat(token.getExpirationDate()).isEqualTo(dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
     }
 }
