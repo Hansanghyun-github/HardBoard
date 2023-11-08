@@ -79,7 +79,7 @@ class NoticeServiceTest {
         // when // then
         assertThatThrownBy(() -> noticeService.editNotice(9L, request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid Id");
+                .hasMessage("Invalid id");
     }
 
     @Test
@@ -98,7 +98,7 @@ class NoticeServiceTest {
         // then
         assertThatThrownBy(() -> noticeService.findById(notice.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid Id");
+                .hasMessage("Invalid id");
     }
 
     @Test

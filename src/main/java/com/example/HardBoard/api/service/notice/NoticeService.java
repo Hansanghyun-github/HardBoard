@@ -30,7 +30,7 @@ public class NoticeService {
     public void editNotice(Long noticeId, NoticeEditServiceRequest request){
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() ->
-                new IllegalArgumentException("Invalid Id"));
+                new IllegalArgumentException("Invalid id"));
         notice.setTitle(request.getTitle());
         notice.setContents(request.getContents());
     }
@@ -42,6 +42,6 @@ public class NoticeService {
     public NoticeResponse findById(Long noticeId) {
         return NoticeResponse.of(noticeRepository.findById(noticeId)
                 .orElseThrow(() ->
-                new IllegalArgumentException("Invalid Id")));
+                new IllegalArgumentException("Invalid id")));
     }
 }
