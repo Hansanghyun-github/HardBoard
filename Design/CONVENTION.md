@@ -12,3 +12,13 @@
 ### 6. 레드-그린-리팩토링 지키면서 구현한다 (TDD)
 
 ### 7. 일단 만들어. 나중에 리팩토링 해. 그래야 속도가 빨라진다.
+
+### 8. 컨트롤러 - 서비스 - 리포지토리 순으로 코드 구현하자
+
+그래야 개발 속도가 빨라진다.
+
+1. 먼저 controller 에서 필요한 api method 들을 세팅한다. - 파라미터와 반환 타입
+2. controller method 에서 필요한 service method 들을 세팅한다.
+3. service method 에서 필요한 repository method 들을 세팅한다.
+4. 코드를 구현
+
