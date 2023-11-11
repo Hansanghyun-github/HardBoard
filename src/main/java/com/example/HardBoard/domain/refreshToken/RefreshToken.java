@@ -1,12 +1,11 @@
 package com.example.HardBoard.domain.refreshToken;
 
+import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.user.User;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -36,8 +35,18 @@ public class RefreshToken {
         this.expirationDate = expirationDate;
     }
 
+    public static RefreshToken create(User user, LocalDateTime dateTime){
+        return RefreshToken.builder()
+                .user(user)
+                .refreshToken(UUID.randomUUID().toString())
+                .expirationDate(dateTime)
+                .build();
+    }
+
     public void refreshTokenRotation(LocalDateTime dateTime){
         this.refreshToken = UUID.randomUUID().toString();
-        this.expirationDate = dateTime.plusSeconds((JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
+        this.expirationDate = dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME);
     }
+
+    public boolean isExpired(LocalDateTime dateTime){ return this.expirationDate.isBefore(dateTime); }
 }

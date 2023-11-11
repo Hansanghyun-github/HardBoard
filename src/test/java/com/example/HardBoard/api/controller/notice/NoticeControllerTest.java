@@ -4,6 +4,7 @@ import com.example.HardBoard.api.controller.notice.request.NoticeCreateRequest;
 import com.example.HardBoard.api.controller.notice.request.NoticeEditRequest;
 import com.example.HardBoard.api.service.notice.NoticeService;
 import com.example.HardBoard.config.SecurityConfig;
+import com.example.HardBoard.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {NoticeController.class})
-@Import(SecurityConfig.class)
+@Import(TestSecurityConfig.class)
 @WithMockUser(roles = "ADMIN")
 class NoticeControllerTest {
     @Autowired

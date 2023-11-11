@@ -1,27 +1,30 @@
 package com.example.HardBoard.api.service.user;
 
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
+import com.example.HardBoard.api.service.user.request.UserPasswordChangeServiceRequest;
 import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.domain.user.User;
+import com.example.HardBoard.domain.user.UserConverter;
 import com.example.HardBoard.domain.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
 @Transactional
 class UserServiceTest {
     @Autowired UserService userService;
-    @Autowired
-    UserRepository userRepository;
+    @Autowired UserRepository userRepository;
+
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    UserConverter userConverter = new UserConverter(passwordEncoder);
     @Test
     @DisplayName("유저를 생성한다")
     void createUser() throws Exception {
@@ -37,7 +40,7 @@ class UserServiceTest {
                         .build();
         
         // when
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
 
         // then
         assertThat(user.getEmail()).isEqualTo(email);
@@ -57,7 +60,7 @@ class UserServiceTest {
                         .password(password)
                         .nickname(nickname)
                         .build();
-        User user1 = userRepository.save(request.toUser());
+        User user1 = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user1.getId();
 
 
@@ -79,7 +82,7 @@ class UserServiceTest {
                         .password(anyString())
                         .nickname(anyString())
                         .build();
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
 
 
@@ -99,7 +102,7 @@ class UserServiceTest {
                         .password(anyString())
                         .nickname(anyString())
                         .build();
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
         
         // when
@@ -120,7 +123,7 @@ class UserServiceTest {
                         .password(anyString())
                         .nickname(anyString())
                         .build();
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
 
         String newNickname = "newNickname";
@@ -143,19 +146,22 @@ class UserServiceTest {
                         .password(prevPassword)
                         .nickname(anyString())
                         .build();
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
 
         String newPassword = "newPassword";
 
         // when
-        userService.changePassword(userId, prevPassword, newPassword);
+        userService.changePassword(UserPasswordChangeServiceRequest
+                .builder()
+                .prevPassword(prevPassword)
+                .newPassword(newPassword)
+                .build());
         String userPassword = user.getPassword();
 
         // then
-        assertThat(userPassword)
-                .isNotEqualTo(prevPassword)
-                .isEqualTo(newPassword);
+        assertThat(passwordEncoder.matches(prevPassword, userPassword)).isFalse();
+        assertThat(passwordEncoder.matches(newPassword, userPassword)).isTrue();
     }
 
     @Test
@@ -169,14 +175,18 @@ class UserServiceTest {
                         .password(prevPassword)
                         .nickname(anyString())
                         .build();
-        User user = userRepository.save(request.toUser());
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
 
         String newPassword = "newPassword";
 
         // when // then
         assertThatThrownBy(() ->
-                userService.changePassword(userId, prevPassword+"sdf", newPassword))
+                userService.changePassword(UserPasswordChangeServiceRequest
+                        .builder()
+                        .prevPassword(prevPassword + "fdsf")
+                        .newPassword(newPassword)
+                        .build()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid password");
     }

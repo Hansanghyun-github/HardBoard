@@ -2,6 +2,7 @@ package com.example.HardBoard.api.service.user.request;
 
 import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
+import com.example.HardBoard.domain.user.request.UserCreateDomainRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,12 +21,11 @@ public class UserCreateServiceRequest {
         this.nickname = nickname;
     }
 
-    public User toUser(){
-        return User.builder()
+    public UserCreateDomainRequest toDomainRequest(){
+        return UserCreateDomainRequest.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
-                .role(Role.ROLE_USER)
                 .build();
     }
 }

@@ -2,8 +2,8 @@ package com.example.HardBoard.api.service.auth;
 
 import com.example.HardBoard.api.service.auth.request.MailCheckServiceRequest;
 import com.example.HardBoard.api.service.auth.request.MailSendServiceRequest;
-import com.example.HardBoard.domain.emailNumber.AuthNumber;
-import com.example.HardBoard.domain.emailNumber.AuthNumberRepository;
+import com.example.HardBoard.domain.authNumber.AuthNumber;
+import com.example.HardBoard.domain.authNumber.AuthNumberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

@@ -1,7 +1,7 @@
 package com.example.HardBoard.domain.refreshToken;
 
+import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.user.User;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class RefreshTokenTest {
     @Test
@@ -34,5 +33,33 @@ class RefreshTokenTest {
         // then
         assertThat(token.getRefreshToken()).isNotEqualTo(prevToken.getRefreshToken());
         assertThat(token.getExpirationDate()).isEqualTo(dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
+    }
+
+    @Test
+    @DisplayName("리프레시토큰이 만료되지 않았다")
+    void notExpiredRefreshToken() throws Exception {
+        // given
+        RefreshToken token = RefreshToken.builder()
+                .refreshToken(UUID.randomUUID().toString())
+                .expirationDate(LocalDateTime.now())
+                .build();
+        LocalDateTime curDateTime = LocalDateTime.now().minusSeconds(10L);
+
+        // when // then
+        assertThat(token.isExpired(curDateTime)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("리프레시토큰이 만료되었다")
+    void expiredRefreshToken() throws Exception {
+        // given
+        RefreshToken token = RefreshToken.builder()
+                .refreshToken(UUID.randomUUID().toString())
+                .expirationDate(LocalDateTime.now())
+                .build();
+        LocalDateTime curDateTime = LocalDateTime.now().plusSeconds(10L);
+
+        // when // then
+        assertThat(token.isExpired(curDateTime)).isEqualTo(true);
     }
 }

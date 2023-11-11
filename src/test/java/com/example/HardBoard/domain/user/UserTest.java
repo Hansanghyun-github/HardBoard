@@ -1,25 +1,31 @@
 package com.example.HardBoard.domain.user;
 
+import com.example.HardBoard.domain.user.request.UserCreateDomainRequest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
 class UserTest {
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    UserConverter userConverter = new UserConverter(passwordEncoder);
     @Test
     @DisplayName("유저의 닉네임을 변경한다")
     void changeNickname() throws Exception {
         // given
         String nickname = "nickname1";
-        User user = User.builder()
+
+        User user = userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(anyString())
                 .password(anyString())
                 .nickname(nickname)
-                .build();
+                .build());
 
         String newNickname = "newNickname";
 
@@ -36,21 +42,21 @@ class UserTest {
     void changePassword() throws Exception {
         // given
         String password = "password1";
-        User user = User.builder()
+        User user = userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(anyString())
                 .password(password)
                 .nickname(anyString())
-                .build();
+                .build());
 
         String newPassword = "newPassword";
 
 
         // when
-        user.changePassword(newPassword);
+        user.changePassword(passwordEncoder, newPassword);
 
         // then
-        assertThat(user.getPassword()).isNotEqualTo(password);
-        assertThat(user.getPassword()).isEqualTo(newPassword);
+        assertThat(passwordEncoder.matches(password, user.getPassword())).isFalse();
+        assertThat(passwordEncoder.matches(newPassword, user.getPassword())).isTrue();
     }
     
     @Test
@@ -58,15 +64,15 @@ class UserTest {
     void checkSamePassword() throws Exception {
         // given
         String password = "password1";
-        User user = User.builder()
+        User user = userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(anyString())
                 .password(password)
                 .nickname(anyString())
-                .build();
+                .build());
 
         
         // when // then
-        assertThat(user.checkPassword(password)).isEqualTo(user);
+        assertThat(user.checkPassword(passwordEncoder, password)).isEqualTo(user);
     }
 
     @Test
@@ -74,14 +80,14 @@ class UserTest {
     void checkDifferentPassword() throws Exception {
         // given
         String password = "password1";
-        User user = User.builder()
+        User user = userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(anyString())
                 .password(password)
                 .nickname(anyString())
-                .build();
+                .build());
 
         // when // then
-        assertThatThrownBy(() -> user.checkPassword(password+"!"))
+        assertThatThrownBy(() -> user.checkPassword(passwordEncoder, password+"!"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid password");
     }

@@ -2,18 +2,19 @@ package com.example.HardBoard.domain.user;
 
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
 import com.example.HardBoard.domain.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class User extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -49,11 +50,15 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public User checkPassword(String password){
-        if(!this.password.equals(password))
+    public User checkPassword(PasswordEncoder passwordEncoder, String password){
+        if(!passwordEncoder.matches(password, this.password))
             throw new IllegalArgumentException("Invalid password");
         return this;
     }
 
-    public void changePassword(String password){ this.password = password; }
+    public void changePassword(PasswordEncoder passwordEncoder, String password){ this.password = passwordEncoder.encode(password); }
+
+    public List<Role> getRoleList() {
+        return Arrays.asList(Role.values());
+    }
 }

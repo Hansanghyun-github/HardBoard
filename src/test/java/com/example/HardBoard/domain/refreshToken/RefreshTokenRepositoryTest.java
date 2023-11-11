@@ -1,9 +1,9 @@
 package com.example.HardBoard.domain.refreshToken;
 
+import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
