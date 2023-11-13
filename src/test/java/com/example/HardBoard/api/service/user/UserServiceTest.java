@@ -1,7 +1,7 @@
 package com.example.HardBoard.api.service.user;
 
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
-import com.example.HardBoard.api.service.user.request.UserPasswordChangeServiceRequest;
+import com.example.HardBoard.api.service.user.request.UserChangePasswordServiceRequest;
 import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserConverter;
@@ -152,7 +152,7 @@ class UserServiceTest {
         String newPassword = "newPassword";
 
         // when
-        userService.changePassword(UserPasswordChangeServiceRequest
+        userService.changePassword(userId, UserChangePasswordServiceRequest
                 .builder()
                 .prevPassword(prevPassword)
                 .newPassword(newPassword)
@@ -182,7 +182,7 @@ class UserServiceTest {
 
         // when // then
         assertThatThrownBy(() ->
-                userService.changePassword(UserPasswordChangeServiceRequest
+                userService.changePassword(userId, UserChangePasswordServiceRequest
                         .builder()
                         .prevPassword(prevPassword + "fdsf")
                         .newPassword(newPassword)

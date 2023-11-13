@@ -135,3 +135,17 @@ Service 테스트할 때, 인증되어 있는지 확인 해야 하나?
 > 
 > 실제 request에서 서비스단까지 갔다는 것은, 이미 인증이 되어 있다는 뜻  
 > -> 불필요한 것같다.
+
+---
+
+테스트할 때 인증(Authentication) 된 객체를 어떻게 알 수 있을까
+
+> 1. @WithMockUser  
+> 지정된 사용자 정보로 UserDetails를 생성한 후 SecurityContext를 로드  
+> (username: user, password: password, role: ROLE_USER)
+> 2. @WithAnonymousUserUser  
+> 익명의 사용자를 테스트하고 싶을 때 사용
+> 3. @WithUserDetails  
+> 내가 원하는 유저를 넣어서 테스트할 수 있다.  
+> (대신 @BeforeTransaction으로 미리 유저를 넣어줘야 함)
+>

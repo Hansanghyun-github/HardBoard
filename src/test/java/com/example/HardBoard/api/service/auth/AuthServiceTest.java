@@ -1,20 +1,20 @@
 package com.example.HardBoard.api.service.auth;
 
 import com.example.HardBoard.api.service.auth.request.AuthLoginServiceRequest;
+import com.example.HardBoard.api.service.auth.request.AuthPasswordChangeServiceRequest;
+import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
+import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.refreshToken.RefreshToken;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
-import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserConverter;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.example.HardBoard.domain.user.request.UserCreateDomainRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
@@ -89,46 +88,107 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("액세스토큰과 리프레시토큰을 생성한다")
-    void createAccessTokenAndRefreshToken() throws Exception {
+    @DisplayName("로그아웃 한다")
+    void logout() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
+                .email(email)
+                .password(password)
+                .nickname(anyString())
+                .build()));
+        AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
+        authService.login(request);
 
+        refreshTokenRepository.save(RefreshToken.builder()
+                .user(user)
+                .refreshToken(UUID.randomUUID().toString())
+                .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                .build());
 
-        // when
-
-        // then
+        // when // then
+        authService.logout();
     }
 
     @Test
-    @DisplayName("토큰들을 만들 때 유효하지 않은 유저id를 입력하면 실패한다")
-    void failToCreateAccessTokenAndRefreshTokenByWrongUserId() throws Exception {
+    @DisplayName("리프레시토큰이 없으면 로그아웃 실패한다")
+    void logoutWithoutRefreshTokenInFail() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
+                .email(email)
+                .password(password)
+                .nickname(anyString())
+                .build()));
+        AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
+        authService.login(request);
 
-
-        // when
-
-        // then
+        // when // then
+        assertThatThrownBy(() -> authService.logout())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid id");
     }
 
     @Test
-    @DisplayName("리프레시토큰 다시 만든다")
-    void remoadeRefreshToken() throws Exception {
+    @DisplayName("인증 없이 비밀번호를 변경한다")
+    void changePassword() throws Exception {
         // given
+        String prevPassword = "password";
+        String email = "gks@gks";
+        UserCreateServiceRequest request =
+                UserCreateServiceRequest.builder()
+                        .email(email)
+                        .password(prevPassword)
+                        .nickname(anyString())
+                        .build();
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
+        Long userId = user.getId();
+
+        String newPassword = "newPassword";
 
         // when
-        
+        authService.changePasswordWithoutAuthentication(AuthPasswordChangeServiceRequest
+                .builder()
+                .email(request.getEmail())
+                .prevPassword(prevPassword)
+                .newPassword(newPassword)
+                .build());
+        String userPassword = user.getPassword();
+
         // then
+        assertThat(passwordEncoder.matches(prevPassword, userPassword)).isFalse();
+        assertThat(passwordEncoder.matches(newPassword, userPassword)).isTrue();
     }
-    
-    @Test
-    @DisplayName("리프레시토큰을 만들 때 잘못된 유저id 또는 이전 리프레시토큰를 입력하면 실패한다")
-    void failToRemadeRefreshTokenByWrongUserIdOrPreviousRefreshToken() throws Exception {
-        // given
 
-        
-        // when
-        
-        // then
+    @Test
+    @DisplayName("비밀번호를 변경할 때 잘못된 비밀번호를 이용하면 에러가 난다")
+    void changePasswordUsingWrongPasswordBeError() throws Exception {
+        // given
+        String prevPassword = "password";
+        String email = "gks@gks";
+        UserCreateServiceRequest request =
+                UserCreateServiceRequest.builder()
+                        .email(email)
+                        .password(prevPassword)
+                        .nickname(anyString())
+                        .build();
+        User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
+        Long userId = user.getId();
+
+        String newPassword = "newPassword";
+
+        // when // then
+        assertThatThrownBy(() ->
+                authService.changePasswordWithoutAuthentication(AuthPasswordChangeServiceRequest
+                        .builder()
+                        .email(request.getEmail())
+                        .prevPassword(prevPassword + "fdsf")
+                        .newPassword(newPassword)
+                        .build()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid password");
     }
 
 }

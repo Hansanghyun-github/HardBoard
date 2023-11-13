@@ -2,32 +2,42 @@ package com.example.HardBoard.api.controller.user;
 
 import com.example.HardBoard.api.controller.user.request.UserChangeNicknameRequest;
 import com.example.HardBoard.api.controller.user.request.UserChangePasswordRequest;
+import com.example.HardBoard.api.service.auth.AuthValidationService;
 import com.example.HardBoard.api.service.user.UserService;
 import com.example.HardBoard.config.TestSecurityConfig;
+import com.example.HardBoard.domain.user.UserConverter;
+import com.example.HardBoard.domain.user.UserRepository;
+import com.example.HardBoard.domain.user.request.UserCreateDomainRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = {UserController.class})
+@WebMvcTest(controllers = UserController.class)
 @Import(TestSecurityConfig.class)
 @WithMockUser
 class UserControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
-
     @MockBean UserService userService;
+    @MockBean AuthValidationService authValidationService;
 
     @Test
     @DisplayName("유저id를 이용해 유저를 찾는다")

@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.service.auth;
 
+import com.example.HardBoard.api.service.auth.request.AuthLoginServiceRequest;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.refreshToken.RefreshToken;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
@@ -31,21 +32,23 @@ class AuthValidationServiceTest {
     @Autowired AuthValidationService authValidationService;
     @Autowired RefreshTokenRepository refreshTokenRepository;
     @Autowired UserRepository userRepository;
+    @Autowired AuthService authService;
     UserConverter userConverter = new UserConverter(new BCryptPasswordEncoder());
     @Test
     @DisplayName("SecurityContext의 userId와 path의 userId가 같다")
     @WithMockUser
     void contextUserIdAndPathUserIdIsSame() throws Exception {
         // given
-        // TODO SecurityContext에 인증 객체 넣기
+        String email="fdsaf@fds";
+        String password = "sadf";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
                 .nickname(anyString())
-                .email(anyString())
-                .password(anyString())
+                .email(email)
+                .password(password)
                 .build()));
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-        SecurityContextHolder.setContext(context);
+
+        authService.login(new AuthLoginServiceRequest(email, password));
+
         Long userId = user.getId();
         
         // when // then
@@ -56,8 +59,17 @@ class AuthValidationServiceTest {
     @DisplayName("SecurityContext의 userId와 path의 userId가 다르면 실패한다")
     void FailContextUserIdAndPathUserIdIsDifferent() throws Exception {
         // given
-        // TODO SecurityContext에 인증 객체 넣기
-        Long userId = 2L;
+        String email="fdsaf@fds";
+        String password = "sadf";
+        User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
+                .nickname(anyString())
+                .email(email)
+                .password(password)
+                .build()));
+
+        authService.login(new AuthLoginServiceRequest(email, password));
+
+        Long userId = user.getId() + 1L;
 
         // when // then
         assertThatThrownBy(() -> authValidationService.verifyPathUserId(userId))

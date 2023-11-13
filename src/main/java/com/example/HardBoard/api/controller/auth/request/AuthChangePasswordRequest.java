@@ -1,7 +1,7 @@
 package com.example.HardBoard.api.controller.auth.request;
 
+import com.example.HardBoard.api.service.auth.request.AuthPasswordChangeServiceRequest;
 import com.example.HardBoard.api.service.auth.request.MailCheckServiceRequest;
-import com.example.HardBoard.api.service.user.request.UserPasswordChangeServiceRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,8 +39,9 @@ public class AuthChangePasswordRequest {
                 .build();
     }
 
-    public UserPasswordChangeServiceRequest toUserPasswordChangeServiceRequest(){
-        return UserPasswordChangeServiceRequest.builder()
+    public AuthPasswordChangeServiceRequest toPasswordChangeServiceRequest(){
+        return AuthPasswordChangeServiceRequest.builder()
+                .email(email)
                 .prevPassword(prevPassword)
                 .newPassword(newPassword)
                 .build();

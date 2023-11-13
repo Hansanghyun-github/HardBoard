@@ -1,11 +1,8 @@
 package com.example.HardBoard.api.service.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.HardBoard.api.service.auth.request.AuthLoginServiceRequest;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
+import com.example.HardBoard.api.service.auth.request.AuthPasswordChangeServiceRequest;
 import com.example.HardBoard.config.auth.PrincipalDetails;
-import com.example.HardBoard.domain.refreshToken.RefreshToken;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
@@ -18,9 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @Transactional
@@ -46,10 +40,9 @@ public class AuthService {
     }
 
     public void logout(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || authentication.isAuthenticated())
-            throw new IllegalStateException("로그인하지 않았습니다");
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
         Long userId = principal.getUser().getId();
 
         if(!refreshTokenRepository.existsByUserId(userId))
@@ -57,5 +50,10 @@ public class AuthService {
         refreshTokenRepository.deleteByUserId(userId);
     }
 
-    // TODO 인증없이 비밀번호 변경하는 메서드 추가
+    public void changePasswordWithoutAuthentication(AuthPasswordChangeServiceRequest request) {
+        userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email"))
+                .checkPassword(passwordEncoder, request.getPrevPassword())
+                .changePassword(passwordEncoder, request.getNewPassword());
+    }
 }

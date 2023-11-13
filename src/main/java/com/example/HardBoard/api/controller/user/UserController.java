@@ -3,6 +3,7 @@ package com.example.HardBoard.api.controller.user;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.user.request.UserChangeNicknameRequest;
 import com.example.HardBoard.api.controller.user.request.UserChangePasswordRequest;
+import com.example.HardBoard.api.service.auth.AuthValidationService;
 import com.example.HardBoard.api.service.user.UserService;
 import com.example.HardBoard.api.service.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,14 @@ import javax.validation.Valid;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final AuthValidationService authValidationService;
 
     @GetMapping("/users/{userId}")
     public ApiResponse<UserResponse> findUser(
             @PathVariable Long userId
     ){
-        //BeforeRequest.verifyUser(userId);
-        return null;
+        authValidationService.verifyPathUserId(userId);
+        return ApiResponse.ok(userService.findUserById(userId));
     }
 
     @PutMapping("/users/{userId}/nickname")
@@ -30,8 +32,9 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody UserChangeNicknameRequest request
     ){
-        //BeforeRequest.verifyUser(userId);
-        return null;
+        authValidationService.verifyPathUserId(userId);
+        userService.changeNickname(userId, request.getNewNickname());
+        return ApiResponse.ok("ok");
     }
 
     @PutMapping("/users/{userId}/password")
@@ -39,8 +42,8 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody UserChangePasswordRequest request
             ){
-        log.info("enter change password");
-        //BeforeRequest.verifyUser(userId);
+        authValidationService.verifyPathUserId(userId);
+        userService.changePassword(userId, request.toServiceRequest());
         return ApiResponse.ok("ok");
     }
 
@@ -48,8 +51,9 @@ public class UserController {
     public ApiResponse<String> deleteUser(
             @PathVariable Long userId
     ){
-        //BeforeRequest.verifyUser(userId);
-        return null;
+        authValidationService.verifyPathUserId(userId);
+        userService.deleteUser(userId);
+        return ApiResponse.ok("ok");
     }
 
 }

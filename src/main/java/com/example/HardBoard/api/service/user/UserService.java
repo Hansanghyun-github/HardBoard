@@ -1,14 +1,12 @@
 package com.example.HardBoard.api.service.user;
 
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
-import com.example.HardBoard.api.service.user.request.UserPasswordChangeServiceRequest;
+import com.example.HardBoard.api.service.user.request.UserChangePasswordServiceRequest;
 import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
-import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
 import com.example.HardBoard.domain.user.UserConverter;
 import com.example.HardBoard.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,17 +45,11 @@ public class UserService {
         // TODO 글자 수 제한
     }
 
-    public void changePassword(UserPasswordChangeServiceRequest request){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || authentication.isAuthenticated())
-            throw new IllegalStateException("로그인하지 않았습니다");
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        userRepository.findById(principal.getUser().getId())
+    public void changePassword(Long userId, UserChangePasswordServiceRequest request){
+        userRepository.findById(userId)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Invalid id"))
                 .checkPassword(passwordEncoder, request.getPrevPassword())
                 .changePassword(passwordEncoder, request.getNewPassword());
-
-        // TODO 비밀번호 암호화를 언제 해야 할지
     }
 }

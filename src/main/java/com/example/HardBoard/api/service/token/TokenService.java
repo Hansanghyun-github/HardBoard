@@ -26,11 +26,9 @@ public class TokenService {
     private final AuthValidationService authValidationService;
 
     public TokenResponse createTokens(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || !authentication.isAuthenticated())
-            throw new IllegalStateException("로그인하지 않았습니다");
-
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
         User user = principal.getUser();
 
         String accessToken = JWT.create()

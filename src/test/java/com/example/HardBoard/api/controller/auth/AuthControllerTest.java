@@ -5,7 +5,11 @@ import com.example.HardBoard.api.controller.auth.request.AuthEmailSendRequest;
 import com.example.HardBoard.api.controller.auth.request.AuthJoinRequest;
 import com.example.HardBoard.api.controller.auth.request.AuthLoginRequest;
 import com.example.HardBoard.api.controller.auth.request.AuthRemadeTokenRequest;
+import com.example.HardBoard.api.service.auth.AuthService;
+import com.example.HardBoard.api.service.auth.MailService;
 import com.example.HardBoard.api.service.auth.response.TokenResponse;
+import com.example.HardBoard.api.service.token.TokenService;
+import com.example.HardBoard.api.service.user.UserService;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +20,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,9 +35,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = {AuthController.class})
 @Import(TestSecurityConfig.class)
+@WithMockUser
 class AuthControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
+
+    @MockBean AuthService authService;
+    @MockBean TokenService tokenService;
+    @MockBean UserService userService;
+    @MockBean MailService mailService;
 
     @Test
     @DisplayName("로그인한다")
@@ -40,7 +51,6 @@ class AuthControllerTest {
         // given
         String email = "gks@gks";
         String password = "password1";
-        // TODO 유저 등록
 
         AuthLoginRequest request = AuthLoginRequest.builder()
                 .email(email)
@@ -140,7 +150,6 @@ class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andDo(print())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"));
         mockMvc.perform(

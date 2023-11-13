@@ -19,11 +19,9 @@ public class AuthValidationService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void verifyPathUserId(Long userId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null)
-            throw new IllegalStateException("로그인하지 않았습니다");
-
-        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
 
         if(!userId.equals(principal.getUser().getId()))
             throw new IllegalArgumentException("Invalid userId");

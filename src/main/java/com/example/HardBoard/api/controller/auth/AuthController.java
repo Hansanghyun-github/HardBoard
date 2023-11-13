@@ -45,7 +45,7 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForJoin(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        // 1. email null & unique 체크, 2. 메일 보냄
+        // TODO 1. email null & unique 체크, 2. 메일 보냄
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
@@ -55,7 +55,7 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForChangePassword(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        // 1. email 있는지 체크, 2. 메일 보냄
+        // TODO 1. email 있는지 체크, 2. 메일 보냄
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
@@ -65,11 +65,8 @@ public class AuthController {
     public ApiResponse<Object> checkNumberAndChangePasswordWithoutLogin(
             @Valid @RequestBody AuthChangePasswordRequest request
     ){
-        // TODO 인증이 없는 구간이라, 메일번호 체크할때 유저 id도 반환하는 것이 좋다.
-        // TODO 비밀번호 바꾸는 것을 AuthService에서 하는 것이 좋을듯(UserService는 인증되어 있다고 가정)
-
         mailService.isCorrectNumber(request.toMailCheckServiceRequest());
-        //userService.changePassword(request.toUserPasswordChangeServiceRequest());
+        authService.changePasswordWithoutAuthentication(request.toPasswordChangeServiceRequest());
 
         return ApiResponse.ok("ok");
     }
