@@ -148,4 +148,14 @@ Service 테스트할 때, 인증되어 있는지 확인 해야 하나?
 > 3. @WithUserDetails  
 > 내가 원하는 유저를 넣어서 테스트할 수 있다.  
 > (대신 @BeforeTransaction으로 미리 유저를 넣어줘야 함)
->
+> 4. 직접 SecurityContext에 인증된 객체를 넣어준다.  
+> -> 이게 가장 간단할 듯  
+> (컨트롤러에는 간단한 객체만 넣어서 validation만 검증하고, 서비스에서는 userId만 보내면 됨)
+
+---
+
+API 테스트가 필요하다.
+
+> @SpringBootTest + @AutoConfigureMockMvc 이용한다  
+> MockMvc를 이용해 request를 보내고, 모든 빈들이 등록됐기 때문에, 모든 빈들을 테스트할 수 있다.
+
