@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,18 +26,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-// 인가
 @Slf4j
 @RequiredArgsConstructor
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final UserRepository userRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		// TODO check 할 필요 없는 url 을 그냥 넘기는 코드 추가
 		// TODO 여기서 exception 터졌을때 처리해주는 filter 생성
+		// TODO Test
 
 		String header = request.getHeader(JwtProperties.HEADER_STRING);
 		if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
@@ -63,32 +63,24 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		// loadByUsername이 호출됨.
 		String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
 				.getClaim("username").asString();
-
-		//TODO 여기서 해당 유저 없다는건 액세스 토큰을 조작했다는것 -> 아예 차단시켜야함
 		if (StringUtils.hasText(username) == false) {
 			log.debug("access denied");
 			throw new AccessDeniedException("유저를 찾을수없습니다");
 		}
 
-		Optional<User> userO = userRepository.findByEmail(username);
+		User user = userRepository.findByEmail(username)
+				.orElseThrow(() -> new AccessDeniedException("유저를 찾을 수 없습니다"));
 
-		if(userO.isEmpty()){
-			log.debug("access denied");
-			throw new AccessDeniedException("유저를 찾을수없습니다");
-		}
-
-		User user=userO.get();
-
-		// 인증은 토큰 검증시 끝. 인증을 하기 위해서가 아닌 스프링 시큐리티가 수행해주는 권한 처리를 위해
-		// 아래와 같이 토큰을 만들어서 Authentication 객체를 강제로 만들고 그걸 세션에 저장!
+		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		PrincipalDetails principalDetails = new PrincipalDetails(user);
-		Authentication authentication = new UsernamePasswordAuthenticationToken(
-				principalDetails, // 나중에 컨트롤러에서 DI해서 쓸 때 사용하기 편함.
-				null, // 패스워드는 모르니까 null 처리, 어차피 지금 인증하는게 아니니까!!
+		Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
+				principalDetails,
+				null,
 				principalDetails.getAuthorities());
+		context.setAuthentication(authentication);
 
 		// 강제로 시큐리티의 세션에 접근하여 값 저장
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		SecurityContextHolder.setContext(context);
 
 		chain.doFilter(request, response);
 

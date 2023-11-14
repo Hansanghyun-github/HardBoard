@@ -1,7 +1,7 @@
 package com.example.HardBoard.config;
 
 import com.example.HardBoard.config.auth.JwtAccessDeniedHandler;
-import com.example.HardBoard.config.filter.JwtAuthorizationFilter;
+import com.example.HardBoard.config.filter.JwtAuthenticationFilter;
 import com.example.HardBoard.config.filter.JwtExceptionHandlingFilter;
 import com.example.HardBoard.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -68,9 +68,9 @@ public class SecurityConfig {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
                     .addFilterBefore(corsConfig.corsFilter(), LogoutFilter.class)
-                    .addFilterAfter(new JwtAuthorizationFilter(userRepository)
+                    .addFilterAfter(new JwtAuthenticationFilter(userRepository)
                             ,ExceptionTranslationFilter.class)
-                    .addFilterBefore(new JwtExceptionHandlingFilter(), JwtAuthorizationFilter.class);
+                    .addFilterBefore(new JwtExceptionHandlingFilter(), JwtAuthenticationFilter.class);
         }
     }
 }
