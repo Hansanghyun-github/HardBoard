@@ -27,6 +27,10 @@ public class AuthNumber {
         this.authNum = authNum;
     }
 
+    public void changeAuthNum(String authNum){
+        this.authNum = authNum;
+    }
+
     public boolean isCorrectAuthNum(String authNum){
         if(!this.authNum.equals(authNum))
             throw new IllegalArgumentException("올바르지 않은 인증번호입니다");

@@ -36,4 +36,38 @@ class UserRepositoryTest {
         assertThat(byEmail.isPresent()).isTrue();
         assertThat(byEmail.get().getEmail()).isEqualTo(email);
     }
+
+    @Test
+    @DisplayName("이메일로 유저가 존재하는지 확인한다(True)")
+    void existsUserByEmail() throws Exception {
+        // given
+        String email = "gks5828@dk";
+
+        User user = User.builder()
+                .email(email)
+                .password("sdfsef")
+                .role(Role.ROLE_USER)
+                .build();
+        userRepository.save(user);
+
+        // when // then
+        assertThat(userRepository.existsByEmail(email)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("이메일로 유저가 존재하는지 확인한다(False)")
+    void existsUserByEmailInFail() throws Exception {
+        // given
+        String email = "gks5828@dk";
+
+        User user = User.builder()
+                .email(email)
+                .password("sdfsef")
+                .role(Role.ROLE_USER)
+                .build();
+        userRepository.save(user);
+
+        // when // then
+        assertThat(userRepository.existsByEmail(email+"fds")).isEqualTo(false);
+    }
 }

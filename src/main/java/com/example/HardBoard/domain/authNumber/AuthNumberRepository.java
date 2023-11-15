@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface AuthNumberRepository extends JpaRepository<AuthNumber, Long> {
     public Optional<AuthNumber> findByEmail(String email);
+
+    public boolean existsByEmail(String email);
 }

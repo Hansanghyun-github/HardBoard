@@ -8,7 +8,24 @@ import static org.assertj.core.api.Assertions.*;
 class AuthNumberTest {
 
     @Test
-    @DisplayName("올바른 인증번호인가")
+    @DisplayName("인증번호를 변경한다")
+    void changeAuthNum() throws Exception {
+        // given
+        String authNum = "number";
+        AuthNumber authNumber = AuthNumber.builder()
+                .email("gks@gks")
+                .authNum(authNum)
+                .build();
+
+        // when
+        authNumber.changeAuthNum(authNum+"gks");
+
+        // then
+        assertThat(authNumber.getAuthNum()).isEqualTo(authNum+"gks");
+    }
+
+    @Test
+    @DisplayName("올바른 인증번호입니다")
     void isCorrectAuthNum() throws Exception {
         // given
         String authNum = "number";

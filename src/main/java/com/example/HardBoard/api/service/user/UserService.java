@@ -3,11 +3,9 @@ package com.example.HardBoard.api.service.user;
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
 import com.example.HardBoard.api.service.user.request.UserChangePasswordServiceRequest;
 import com.example.HardBoard.api.service.user.response.UserResponse;
-import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.user.UserConverter;
 import com.example.HardBoard.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +31,8 @@ public class UserService {
                         new IllegalArgumentException("Invalid id")));
     }
 
+    public boolean existsByEmail(String email){ return userRepository.existsByEmail(email); }
+
     public void deleteUser(Long userId){
         userRepository.deleteById(userId);
     }
@@ -52,4 +52,6 @@ public class UserService {
                 .checkPassword(passwordEncoder, request.getPrevPassword())
                 .changePassword(passwordEncoder, request.getNewPassword());
     }
+
+
 }

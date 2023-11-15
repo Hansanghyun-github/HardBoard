@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -139,11 +141,14 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("이메일에 인증번호를 보낸다")
-    void sendNumberToEmailCheck() throws Exception {
+    @DisplayName("회원가입을 위한 이메일에 인증번호를 보낸다")
+    void sendNumberToEmailCheckForJoin() throws Exception {
         // given
-        AuthEmailSendRequest request = new AuthEmailSendRequest("email@email");
+        AuthEmailSendRequest request = AuthEmailSendRequest.builder()
+                .email("email@email")
+                .build();
 
+        Mockito.when(userService.existsByEmail(any())).thenReturn(false);
         // when // then
         mockMvc.perform(
                         post("/auth/email/send")
@@ -152,6 +157,18 @@ class AuthControllerTest {
                 )
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경을 위한 이메일에 인증번호를 보낸다")
+    void sendNumberToEmailCheckForChangePassword() throws Exception {
+        // given
+        AuthEmailSendRequest request = AuthEmailSendRequest.builder()
+                .email("email@email")
+                .build();
+
+        Mockito.when(userService.existsByEmail(any())).thenReturn(true);
+        // when // then
         mockMvc.perform(
                         post("/auth/users/email/send")
                                 .content(objectMapper.writeValueAsString(request))
@@ -160,12 +177,15 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"));
     }
+
     @ParameterizedTest
-    @CsvSource(value = {"", "email"})
-    @DisplayName("올바르지 않은 이메일을 입력하면 sendNumber 실패한다")
-    void failSendNumberWhenEnterWrongEmail(String email) throws Exception {
+    @CsvSource(value = {"null", "email"}, nullValues = {"null"})
+    @DisplayName("올바르지 않은 이메일을 입력하면 sendNumberForJoin 실패한다")
+    void failSendNumberForJoinWhenEnterWrongEmail(String email) throws Exception {
         // given
-        AuthEmailSendRequest request = new AuthEmailSendRequest(email);
+        AuthEmailSendRequest request = AuthEmailSendRequest.builder()
+                .email(email)
+                .build();
 
         // when // then
         mockMvc.perform(
@@ -175,6 +195,18 @@ class AuthControllerTest {
                 )
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"null", "email"}, nullValues = {"null"})
+    @DisplayName("올바르지 않은 이메일을 입력하면 sendNumberForPassword 실패한다")
+    void failSendNumberForPasswordWhenEnterWrongEmail(String email) throws Exception {
+        // given
+        AuthEmailSendRequest request = AuthEmailSendRequest.builder()
+                .email(email)
+                .build();
+
+        // when // then
         mockMvc.perform(
                         post("/auth/users/email/send")
                                 .content(objectMapper.writeValueAsString(request))

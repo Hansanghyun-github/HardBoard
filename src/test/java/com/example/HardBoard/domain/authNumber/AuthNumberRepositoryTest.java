@@ -32,4 +32,34 @@ class AuthNumberRepositoryTest {
                         new IllegalArgumentException("Invalid email")).getId())
                 .isEqualTo(id);
     }
+
+    @Test
+    @DisplayName("이메일을 통해 객체가 존재하는지 알아낸다")
+    void existsByEmail() throws Exception {
+        // given
+        String email = "email@email";
+        authNumberRepository.save(
+                AuthNumber.builder()
+                        .email(email)
+                        .authNum(anyString())
+                        .build());
+
+        // when // then
+        assertThat(authNumberRepository.existsByEmail(email)).isTrue();
+    }
+
+    @Test
+    @DisplayName("이메일이 존재하지 않으면 못 찾는다")
+    void existsByEmailInFail() throws Exception {
+        // given
+        String email = "email@email";
+        authNumberRepository.save(
+                AuthNumber.builder()
+                        .email(email)
+                        .authNum(anyString())
+                        .build());
+
+        // when // then
+        assertThat(authNumberRepository.existsByEmail(email+"fsad")).isFalse();
+    }
 }

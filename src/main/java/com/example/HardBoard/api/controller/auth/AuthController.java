@@ -7,8 +7,10 @@ import com.example.HardBoard.api.service.auth.MailService;
 import com.example.HardBoard.api.service.auth.response.TokenResponse;
 import com.example.HardBoard.api.service.token.TokenService;
 import com.example.HardBoard.api.service.user.UserService;
+import com.example.HardBoard.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +39,8 @@ public class AuthController {
     public ApiResponse<String> join(
             @Valid @RequestBody AuthJoinRequest request
     ){
+        if(log.isDebugEnabled()) log.debug("join start");
+
         userService.createUser(request.toUserServiceRequest());
         return ApiResponse.ok("ok");
     }
@@ -45,7 +49,7 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForJoin(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        // TODO 1. email null & unique 체크, 2. 메일 보냄
+        if(userService.existsByEmail(request.getEmail()) == true) throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
@@ -55,7 +59,7 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForChangePassword(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        // TODO 1. email 있는지 체크, 2. 메일 보냄
+        if(userService.existsByEmail(request.getEmail()) == false) throw new IllegalArgumentException("존재하지 않는 이메일입니다.");
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
@@ -71,9 +75,9 @@ public class AuthController {
         return ApiResponse.ok("ok");
     }
 
-    @PostMapping("/auth/logout")
-    public ApiResponse<String> logout(){
-        authService.logout();
+    @PostMapping("/users/logout")
+    public ApiResponse<String> logout(@AuthenticationPrincipal PrincipalDetails principal){
+        authService.logout(principal.getUser().getId());
         return ApiResponse.ok("ok");
     }
 

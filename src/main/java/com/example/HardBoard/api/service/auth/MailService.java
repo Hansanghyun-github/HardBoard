@@ -23,17 +23,24 @@ public class MailService {
     private final Random random = ThreadLocalRandom.current();
 
     public void sendEmail(MailSendServiceRequest request){
-
         String authNum = makeAuthNumber();
-        authNumberRepository.save(AuthNumber.builder()
-                .email(request.getTo())
-                .authNum(authNum)
-                .build());
+
+        if(authNumberRepository.existsByEmail(request.getTo()) == true){
+            authNumberRepository.findByEmail(request.getTo())
+                    .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 이메일입니다"))
+                    .changeAuthNum(authNum);
+
+        } else {
+            authNumberRepository.save(AuthNumber.builder()
+                    .email(request.getTo())
+                    .authNum(authNum)
+                    .build());
+        }
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(request.getTo());
         message.setSubject("HardBoard 인증번호입니다.");
-        message.setText("HardBoard 이용을 위한 이메일 인증번호는\n" + authNum + " 입니다.");
+        message.setText("HardBoard 이메일 인증번호는\n" + authNum + " 입니다.");
 
         mailSender.send(message);
     }
