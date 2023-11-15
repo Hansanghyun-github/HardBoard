@@ -39,12 +39,7 @@ public class AuthService {
         SecurityContextHolder.setContext(context);
     }
 
-    public void logout(){
-        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        Long userId = principal.getUser().getId();
-
+    public void logout(Long userId){
         if(!refreshTokenRepository.existsByUserId(userId))
             throw new IllegalArgumentException("Invalid id");
         refreshTokenRepository.deleteByUserId(userId);

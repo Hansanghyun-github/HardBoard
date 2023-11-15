@@ -107,8 +107,10 @@ class AuthServiceTest {
                 .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build());
 
+        Long userId = user.getId();
+
         // when // then
-        authService.logout();
+        authService.logout(userId);
     }
 
     @Test
@@ -125,8 +127,10 @@ class AuthServiceTest {
         AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
         authService.login(request);
 
+        Long userId = user.getId();
+
         // when // then
-        assertThatThrownBy(() -> authService.logout())
+        assertThatThrownBy(() -> authService.logout(userId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid id");
     }
