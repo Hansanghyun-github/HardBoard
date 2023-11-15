@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeRequests(auth -> auth
                         .antMatchers("/notices/**", "/admin/**")
                         .hasAuthority("ROLE_ADMIN")
-                        .antMatchers("/auth/**", "/public/**")
+                        .antMatchers("/auth/**", "/public/**", "/error")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

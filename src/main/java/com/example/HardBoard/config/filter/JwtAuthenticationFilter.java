@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -62,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		// 내가 SecurityContext에 집적접근해서 세션을 만들때 자동으로 UserDetailsService에 있는
 		// loadByUsername이 호출됨.
 		String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
-				.getClaim("username").asString();
+				.getClaim("email").asString();
 		if (StringUtils.hasText(username) == false) {
 			log.debug("access denied");
 			throw new AccessDeniedException("유저를 찾을수없습니다");
@@ -73,10 +74,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		PrincipalDetails principalDetails = new PrincipalDetails(user);
-		Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
+		UsernamePasswordAuthenticationToken authentication = UsernamePasswordAuthenticationToken.authenticated(
 				principalDetails,
 				null,
 				principalDetails.getAuthorities());
+		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		context.setAuthentication(authentication);
 
 		// 강제로 시큐리티의 세션에 접근하여 값 저장

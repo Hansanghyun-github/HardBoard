@@ -1,9 +1,13 @@
 package com.example.HardBoard.api;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@ToString
+@NoArgsConstructor
 public class ApiResponse<T> {
 
     private int code;

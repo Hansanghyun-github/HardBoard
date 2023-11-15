@@ -159,3 +159,36 @@ API 테스트가 필요하다.
 > @SpringBootTest + @AutoConfigureMockMvc 이용한다  
 > MockMvc를 이용해 request를 보내고, 모든 빈들이 등록됐기 때문에, 모든 빈들을 테스트할 수 있다.
 
+---
+
+HttpMessageNotReadableException: JSON parse error
+
+> Dto에 @NoArgsConstructor가 필요하다. (not @AllArgsConstructor, @RequiredArgsConstructor)  
+> @RequestBody는 기본 생성자를 이용하기 때문이다.
+
+---
+
+"java.util.LinkedHashMap cannot be cast to Class" 문제
+
+다중 json 객체를 변환할 때 일어 나는 문제
+
+```java
+class TestObject{
+    int age;
+    String name;
+    Friend friend;
+}
+```
+
+위 객체는 Friend라는 객체를 포함하고 있기 때문에, 처음 JSON을 파싱했을 때는 문제가 없지만, Friend를 얻으려고 할 때 문제가 발생한다.
+
+> 해결 방법
+> 
+> 처음 TestObject는 ObjectMapper로 그냥 읽고,  
+> Friend 객체를 ObjectMapper를 통해 String으로 변환 후, 다시 읽는다.
+> 
+```java
+TestObject testObject = objectMapper.readValue(jsonData, TestObject.class);
+objectMapper.readValue(objectMapper.writeValueAsString(testObject.getFriend), Friend.class);
+```
+
