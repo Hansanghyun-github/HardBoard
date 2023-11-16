@@ -7,6 +7,7 @@ import com.example.HardBoard.api.service.auth.MailService;
 import com.example.HardBoard.api.service.auth.response.TokenResponse;
 import com.example.HardBoard.api.service.token.TokenService;
 import com.example.HardBoard.api.service.user.UserService;
+import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class AuthController {
             @Valid @RequestBody AuthLoginRequest request
     ){
         authService.login(request.toServiceRequest());
-        return ApiResponse.ok(tokenService.createTokens());
+        return ApiResponse.ok(tokenService.createTokens(System.currentTimeMillis()));
     }
 
     @PostMapping("/auth/join")
@@ -86,7 +88,7 @@ public class AuthController {
             @Valid @RequestBody AuthRemadeTokenRequest request
     ){
         return ApiResponse.ok(tokenService.accessTokenExpired(
-                request.getRefreshToken(), LocalDateTime.now()
+                request.getRefreshToken(), System.currentTimeMillis()
         ));
     }
 }

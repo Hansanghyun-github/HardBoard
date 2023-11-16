@@ -62,14 +62,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		// 토큰 검증 (이게 인증이기 때문에 AuthenticationManager도 필요 없음)
 		// 내가 SecurityContext에 집적접근해서 세션을 만들때 자동으로 UserDetailsService에 있는
 		// loadByUsername이 호출됨.
-		String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
+		String email = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
 				.getClaim("email").asString();
-		if (StringUtils.hasText(username) == false) {
+		if (StringUtils.hasText(email) == false) {
 			log.debug("access denied");
-			throw new AccessDeniedException("유저를 찾을수없습니다");
+			throw new AccessDeniedException("유저를 찾을 수 없습니다");
 		}
 
-		User user = userRepository.findByEmail(username)
+		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new AccessDeniedException("유저를 찾을 수 없습니다"));
 
 		SecurityContext context = SecurityContextHolder.createEmptyContext();

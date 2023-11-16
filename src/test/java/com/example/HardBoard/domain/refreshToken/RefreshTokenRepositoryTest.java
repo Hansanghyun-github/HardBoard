@@ -6,6 +6,7 @@ import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
 @Transactional
@@ -106,5 +108,58 @@ class RefreshTokenRepositoryTest {
 
         // then
         assertThat(refreshTokenRepository.existsByUserId(userId)).isFalse();
+    }
+
+    @Test
+    @DisplayName("유저id로 리프레시토큰 객체를 찾는다")
+    void findByUserId() throws Exception {
+        // given
+        User user = userRepository.save(
+                User.builder()
+                        .nickname(anyString())
+                        .email(anyString())
+                        .password(anyString())
+                        .build());
+        RefreshToken token = refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .refreshToken(UUID.randomUUID().toString())
+                        .user(user)
+                        .expirationDate(LocalDateTime.now()
+                                .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                        .build());
+
+        // when
+        RefreshToken findedToken = refreshTokenRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("invalid userId"));
+
+        // then
+        assertThat(findedToken.getRefreshToken()).isEqualTo(token.getRefreshToken());
+        assertThat(findedToken.getExpirationDate()).isEqualTo(token.getExpirationDate());
+        assertThat(findedToken.getUser()).isEqualTo(user);
+    }
+
+    @Test
+    @DisplayName("잘못된 유저id로는 리프레시토큰 객체를 찾지 못한다")
+    void findByWrongUserIdInFail() throws Exception {
+        // given
+        User user = userRepository.save(
+                User.builder()
+                        .nickname(anyString())
+                        .email(anyString())
+                        .password(anyString())
+                        .build());
+        RefreshToken token = refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .refreshToken(UUID.randomUUID().toString())
+                        .user(user)
+                        .expirationDate(LocalDateTime.now()
+                                .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                        .build());
+
+        // when // then
+        assertThatThrownBy(() -> refreshTokenRepository.findByUserId(user.getId()+1L)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid userId")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid userId");
     }
 }

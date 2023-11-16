@@ -192,3 +192,11 @@ TestObject testObject = objectMapper.readValue(jsonData, TestObject.class);
 objectMapper.readValue(objectMapper.writeValueAsString(testObject.getFriend), Friend.class);
 ```
 
+---
+
+JWT 라이브러리는 액세스 토큰의 expiredTime의 밀리초가 0으로 세팅 된다.
+
+> 테스트 할 때는, expiredTime을 일부러 (/1000 *1000)을 해줬음 - 밀리초 0으로 만들도록
+
+---
+
