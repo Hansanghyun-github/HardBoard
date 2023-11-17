@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @ToString
 @NoArgsConstructor
 public class ApiResponse<T> {
+    // TODO data가 필요 없을 때, null 을 넘기는게 좋은가? 어떻게 처리할까?
 
     private int code;
     private HttpStatus status;
