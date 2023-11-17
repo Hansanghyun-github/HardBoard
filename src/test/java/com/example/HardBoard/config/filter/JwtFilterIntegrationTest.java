@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
 @ExtendWith(MockitoExtension.class)
-class JwtFilterTest {
+class JwtFilterIntegrationTest {
     @MockBean UserService userService;
     @MockBean AuthValidationService authValidationService;
 

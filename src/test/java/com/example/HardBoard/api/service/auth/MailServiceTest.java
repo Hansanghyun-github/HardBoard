@@ -8,19 +8,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
 class MailServiceTest {
-    @Autowired
-    AuthNumberRepository authNumberRepository;
-    @Autowired
-    MailService mailService;
+    @Autowired AuthNumberRepository authNumberRepository;
+    @Autowired MailService mailService;
+
+    @MockBean JavaMailSender javaMailSender;
 
     @Test
     @DisplayName("이메일에 인증번호를 보낸다")
@@ -31,9 +37,9 @@ class MailServiceTest {
                 .build();
 
         // when // then
-        //mailService.sendEmail(request);
+        mailService.sendEmail(request);
 
-        // TODO 외부 라이브러리는 테스트를 어떻게 해야 할까
+        verify(javaMailSender, times(1)).send(ArgumentMatchers.any(SimpleMailMessage.class));
     }
 
     @Test
