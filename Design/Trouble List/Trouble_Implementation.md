@@ -205,6 +205,13 @@ JWT 라이브러리는 액세스 토큰의 expiredTime의 밀리초가 0으로 �
 그냥 단위테스트로는 힘들다  
 -> request에 임의의 헤더를 추가할 수 없다.
 
-> @WebMvcTest로 결정
+> @Mock으로 단위테스트 진행
 > 
-> 그냥 아무 URL 보내서 필터 체크한다.
+> 헤더 추가하지 않고, getHeader 할 때 내가 지정해서 주도록 세팅
+
+---
+
+JwtAuthenticationFilterTest에서 Secret 조작테스트를 혼자 진행했을 때는 성공, 전체를 돌렸을 때는 실패했다.
+
+그런데 @ExtendWith(MockitoExtension.class)를 붙이니까 성공했다. 왜지?
+

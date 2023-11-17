@@ -24,7 +24,7 @@ public class JwtExceptionHandlingFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request,response);
         } catch (IllegalArgumentException |
-                SignatureVerificationException |
+                 SignatureVerificationException |
                  JWTDecodeException |
                  MissingClaimException |
                  IncorrectClaimException ex){
