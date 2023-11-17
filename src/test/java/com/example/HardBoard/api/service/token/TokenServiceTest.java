@@ -147,11 +147,14 @@ class TokenServiceTest {
     @DisplayName("리프레시토큰이 만료되었다면 재발급 실패한다")
     void ifRefreshTokenIsExpiredReCreateTokenInFail() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(
                 User.builder()
-                        .nickname(anyString())
-                        .email(anyString())
-                        .password(anyString())
+                        .nickname(nickname)
+                        .email(email)
+                        .password(password)
                         .build());
         String refreshTokenName = "refreshToken";
         String refreshToken = refreshTokenRepository.save(
@@ -162,7 +165,7 @@ class TokenServiceTest {
                         .build()).getRefreshToken();
 
         // when // then
-        assertThatThrownBy(() -> tokenService.accessTokenExpired(refreshTokenName, any()))
+        assertThatThrownBy(() -> tokenService.accessTokenExpired(refreshTokenName, 0L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("RefreshToken was expired");
     }
@@ -171,7 +174,8 @@ class TokenServiceTest {
     @DisplayName("유효하지 않은 리프레시토큰이라면 재발급 실패한다")
     void ifRefreshTokenIsInvalidReCreateTokenInFail() throws Exception {
         // when // then
-        assertThatThrownBy(() -> tokenService.accessTokenExpired(anyString(), any()))
+        String refreshToken = "refreshToken";
+        assertThatThrownBy(() -> tokenService.accessTokenExpired(refreshToken, 0L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid token");
     }

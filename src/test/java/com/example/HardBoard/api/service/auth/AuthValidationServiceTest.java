@@ -41,8 +41,9 @@ class AuthValidationServiceTest {
         // given
         String email="fdsaf@fds";
         String password = "sadf";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
-                .nickname(anyString())
+                .nickname(nickname)
                 .email(email)
                 .password(password)
                 .build()));
@@ -61,8 +62,9 @@ class AuthValidationServiceTest {
         // given
         String email="fdsaf@fds";
         String password = "sadf";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
-                .nickname(anyString())
+                .nickname(nickname)
                 .email(email)
                 .password(password)
                 .build()));
@@ -81,10 +83,13 @@ class AuthValidationServiceTest {
     @DisplayName("유저id와 리프레시토큰을 이용해서 RefreshToken 객체를 검증한다")
     void verifyRefreshToken() throws Exception {
         // given;
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(User.builder()
-                .email(anyString())
-                .password(anyString())
-                .nickname(anyString())
+                .email(email)
+                .password(password)
+                .nickname(nickname)
                 .role(Role.ROLE_USER)
                 .build());
         Long userId = user.getId();
@@ -103,10 +108,13 @@ class AuthValidationServiceTest {
     @DisplayName("리프레시토큰에 해당하는 객체가 없기 때문에, verify에 실패한다")
     void failVerifyRefreshTokenFromInvalidRefreshToken() throws Exception {
         // given;
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(User.builder()
-                .email(anyString())
-                .password(anyString())
-                .nickname(anyString())
+                .email(email)
+                .password(password)
+                .nickname(nickname)
                 .role(Role.ROLE_USER)
                 .build());
         Long userId = user.getId();
@@ -127,10 +135,13 @@ class AuthValidationServiceTest {
     @DisplayName("리프레시토큰이 만료되었기 때문에, verify에 실패한다")
     void failVerifyRefreshTokenBecauseRefreshTokenIsExpired() throws Exception {
         // given;
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(User.builder()
-                .email(anyString())
-                .password(anyString())
-                .nickname(anyString())
+                .email(email)
+                .password(password)
+                .nickname(nickname)
                 .role(Role.ROLE_USER)
                 .build());
         Long userId = user.getId();

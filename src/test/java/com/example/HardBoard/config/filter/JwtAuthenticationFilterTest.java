@@ -13,6 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,23 +30,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
+    @Mock
     UserRepository userRepository;
+    @InjectMocks
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Mock
     HttpServletRequest request;
+    @Mock
     HttpServletResponse response;
+    @Mock
     FilterChain filterChain;
-
-    @BeforeEach
-    void initialize(){
-        userRepository = Mockito.mock(UserRepository.class);
-        request = Mockito.mock(HttpServletRequest.class);
-        response = Mockito.mock(HttpServletResponse.class);
-        filterChain = Mockito.mock(FilterChain.class);
-
-        jwtAuthenticationFilter =
-                new JwtAuthenticationFilter(userRepository);
-    }
 
     @Test
     @DisplayName("Authorization 헤더가 비어 있다면 그냥 통과한다")

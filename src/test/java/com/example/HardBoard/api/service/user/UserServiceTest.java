@@ -76,11 +76,14 @@ class UserServiceTest {
     @DisplayName("잘못된 유저id로 조회하면 에러가 난다")
     void findUserDifferentIdBeError() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
-                        .email(anyString())
-                        .password(anyString())
-                        .nickname(anyString())
+                        .email(email)
+                        .password(password)
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
@@ -96,11 +99,14 @@ class UserServiceTest {
     @DisplayName("유저를 삭제한다")
     void deleteUser() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
-                        .email(anyString())
-                        .password(anyString())
-                        .nickname(anyString())
+                        .email(email)
+                        .password(password)
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
@@ -117,11 +123,14 @@ class UserServiceTest {
     @DisplayName("닉네임을 변경한다")
     void changeNickname() throws Exception {
         // given
+        String email = "email@email";
+        String password = "password";
+        String nickname = "nickname";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
-                        .email(anyString())
-                        .password(anyString())
-                        .nickname(anyString())
+                        .email(email)
+                        .password(password)
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
@@ -139,12 +148,14 @@ class UserServiceTest {
     @DisplayName("비밀번호를 변경한다")
     void changePassword() throws Exception {
         // given
+        String email = "email@email";
+        String nickname = "nickname";
         String prevPassword = "password";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
-                        .email(anyString())
+                        .email(email)
                         .password(prevPassword)
-                        .nickname(anyString())
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
@@ -168,12 +179,14 @@ class UserServiceTest {
     @DisplayName("비밀번호를 변경할 때 잘못된 비밀번호를 이용하면 에러가 난다")
     void changePasswordUsingWrongPasswordBeError() throws Exception {
         // given
+        String email = "email@email";
+        String nickname = "nickname";
         String prevPassword = "password";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
-                        .email(anyString())
+                        .email(email)
                         .password(prevPassword)
-                        .nickname(anyString())
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();

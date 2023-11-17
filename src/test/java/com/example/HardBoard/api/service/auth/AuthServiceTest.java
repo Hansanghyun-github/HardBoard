@@ -46,10 +46,11 @@ class AuthServiceTest {
         // given
         String email = "email@email";
         String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(email)
                 .password(password)
-                .nickname(anyString())
+                .nickname(nickname)
                 .build()));
         AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
 
@@ -73,10 +74,11 @@ class AuthServiceTest {
         // given
         String loginEmail = "email@email";
         String loginPassword = "password";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(loginEmail)
                 .password(loginPassword)
-                .nickname(anyString())
+                .nickname(nickname)
                 .build()));
         AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
 
@@ -93,10 +95,11 @@ class AuthServiceTest {
         // given
         String email = "email@email";
         String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(email)
                 .password(password)
-                .nickname(anyString())
+                .nickname(nickname)
                 .build()));
         AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
         authService.login(request);
@@ -119,10 +122,11 @@ class AuthServiceTest {
         // given
         String email = "email@email";
         String password = "password";
+        String nickname = "nickname";
         User user = userRepository.save(userConverter.toEntity(UserCreateDomainRequest.builder()
                 .email(email)
                 .password(password)
-                .nickname(anyString())
+                .nickname(nickname)
                 .build()));
         AuthLoginServiceRequest request = new AuthLoginServiceRequest(email, password);
         authService.login(request);
@@ -141,11 +145,12 @@ class AuthServiceTest {
         // given
         String prevPassword = "password";
         String email = "gks@gks";
+        String nickname = "nickname";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
                         .email(email)
                         .password(prevPassword)
-                        .nickname(anyString())
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();
@@ -172,11 +177,12 @@ class AuthServiceTest {
         // given
         String prevPassword = "password";
         String email = "gks@gks";
+        String nickname = "nickname";
         UserCreateServiceRequest request =
                 UserCreateServiceRequest.builder()
                         .email(email)
                         .password(prevPassword)
-                        .nickname(anyString())
+                        .nickname(nickname)
                         .build();
         User user = userRepository.save(userConverter.toEntity(request.toDomainRequest()));
         Long userId = user.getId();

@@ -211,7 +211,13 @@ JWT 라이브러리는 액세스 토큰의 expiredTime의 밀리초가 0으로 �
 
 ---
 
-JwtAuthenticationFilterTest에서 Secret 조작테스트를 혼자 진행했을 때는 성공, 전체를 돌렸을 때는 실패했다.
+org.mockito.exceptions.misusing.InvalidUseOfMatchersException:
+Misplaced or misused argument matcher detected here:
 
-그런데 @ExtendWith(MockitoExtension.class)를 붙이니까 성공했다. 왜지?
+> StackOverflow에서 찾아 본 결과
+> 
+> ArgumentMatchers의 any~()는 특정 메서드 내의 파라미터를 넣어줄 때만 사용해야 함  
+> any~()를 이용해서 실제 객체를 만들면 안됨
+> 
+> 그냥 빈 문자열을 넣어줘야 함
 
