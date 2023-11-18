@@ -141,6 +141,10 @@ class TokenServiceTest {
                 ));
 
         assertThat(tokenResponse.getRefreshToken()).isNotEqualTo(refreshTokenName);
+        assertThat(refreshTokenRepository.findByUserId(user.getId())
+                .orElseThrow().getRefreshToken())
+                .isNotEqualTo(refreshTokenName)
+                .isEqualTo(tokenResponse.getRefreshToken());
     }
 
     @Test

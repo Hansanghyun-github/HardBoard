@@ -39,7 +39,8 @@ public class RefreshToken {
         return RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(dateTime)
+                .expirationDate(dateTime
+                        .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build();
     }
 
