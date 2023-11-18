@@ -1,12 +1,10 @@
 package com.example.HardBoard.api.controller.auth;
 
 import com.example.HardBoard.api.ApiResponse;
-import com.example.HardBoard.api.controller.auth.request.AuthEmailSendRequest;
-import com.example.HardBoard.api.controller.auth.request.AuthJoinRequest;
-import com.example.HardBoard.api.controller.auth.request.AuthLoginRequest;
-import com.example.HardBoard.api.controller.auth.request.AuthRemadeTokenRequest;
+import com.example.HardBoard.api.controller.auth.request.*;
 import com.example.HardBoard.api.service.auth.AuthService;
 import com.example.HardBoard.api.service.auth.MailService;
+import com.example.HardBoard.api.service.auth.request.MailCheckServiceRequest;
 import com.example.HardBoard.api.service.auth.response.TokenResponse;
 import com.example.HardBoard.api.service.token.TokenService;
 import com.example.HardBoard.api.service.user.UserService;
@@ -28,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -102,6 +101,9 @@ class AuthControllerTest {
                 .authNumber("1234")
                 .build();
 
+        when(mailService.isCorrectNumber(any(MailCheckServiceRequest.class)))
+                .thenReturn(true);
+
         // when // then
         mockMvc.perform(
                         post("/auth/join")
@@ -148,7 +150,7 @@ class AuthControllerTest {
                 .email("email@email")
                 .build();
 
-        Mockito.when(userService.existsByEmail(any())).thenReturn(false);
+        when(userService.existsByEmail(any())).thenReturn(false);
         // when // then
         mockMvc.perform(
                         post("/auth/email/send")
@@ -167,7 +169,7 @@ class AuthControllerTest {
                 .email("email@email")
                 .build();
 
-        Mockito.when(userService.existsByEmail(any())).thenReturn(true);
+        when(userService.existsByEmail(any())).thenReturn(true);
         // when // then
         mockMvc.perform(
                         post("/auth/users/email/send")
@@ -251,5 +253,26 @@ class AuthControllerTest {
                 )
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
+    }
+
+    @Test
+    @DisplayName("인증없이 유저의 비밀번호를 변경한다")
+    void changePasswordWithoutAuthentication() throws Exception {
+        // given
+        AuthChangePasswordRequest request = AuthChangePasswordRequest.builder()
+                .email("email@email")
+                .prevPassword("prev")
+                .newPassword("new")
+                .authNumber("283")
+                .build();
+
+        when(mailService.isCorrectNumber(any(MailCheckServiceRequest.class)))
+                .thenReturn(true);
+
+        // when // then
+        mockMvc.perform(
+                post("/auth/password/change")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON));
     }
 }

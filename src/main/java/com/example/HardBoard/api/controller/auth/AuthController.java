@@ -43,6 +43,9 @@ public class AuthController {
     ){
         if(log.isDebugEnabled()) log.debug("join start");
 
+        if(mailService.isCorrectNumber(request.toMailCheckServiceRequest()) == false)
+            throw new IllegalArgumentException("올바르지 않은 인증번호입니다.");
+
         userService.createUser(request.toUserServiceRequest());
         return ApiResponse.ok("ok");
     }
@@ -51,7 +54,8 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForJoin(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        if(userService.existsByEmail(request.getEmail()) == true) throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        if(userService.existsByEmail(request.getEmail()) == true)
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
@@ -61,17 +65,19 @@ public class AuthController {
     public ApiResponse<String> sendNumberToEmailCheckForChangePassword(
             @Valid @RequestBody AuthEmailSendRequest request
     ){
-        if(userService.existsByEmail(request.getEmail()) == false) throw new IllegalArgumentException("존재하지 않는 이메일입니다.");
+        if(userService.existsByEmail(request.getEmail()) == false)
+            throw new IllegalArgumentException("존재하지 않는 이메일입니다.");
 
         mailService.sendEmail(request.toServiceRequest());
         return ApiResponse.ok("ok");
     }
 
     @PostMapping("/auth/password/change")
-    public ApiResponse<Object> checkNumberAndChangePasswordWithoutLogin(
+    public ApiResponse<String> checkNumberAndChangePasswordWithoutLogin(
             @Valid @RequestBody AuthChangePasswordRequest request
     ){
-        mailService.isCorrectNumber(request.toMailCheckServiceRequest());
+        if(mailService.isCorrectNumber(request.toMailCheckServiceRequest()) == false)
+            throw new IllegalArgumentException("올바르지 않은 인증번호입니다.");
         authService.changePasswordWithoutAuthentication(request.toPasswordChangeServiceRequest());
 
         return ApiResponse.ok("ok");

@@ -46,4 +46,11 @@ public class AuthJoinRequest {
                 .authNumber(authNumber)
                 .build();
     }
+
+    public MailCheckServiceRequest toMailCheckServiceRequest() {
+        return MailCheckServiceRequest.builder()
+                .email(this.email)
+                .authNumber(this.authNumber)
+                .build();
+    }
 }
