@@ -221,3 +221,22 @@ Misplaced or misused argument matcher detected here:
 > 
 > 그냥 빈 문자열을 넣어줘야 함
 
+---
+
+특정 객체를 테스트할 때, 각 필드별로 어떻게 테스트 해야 하나
+
+> assertThat().satisfies 이용
+> 
+> assertThat(user).satisfies(user -> {
+>   assertThat(user.getUsername).isEqualTo();
+>   ...
+> })
+> 
+> 이렇게 하면 됨
+
+> 리스트를 테스트 할 때는 메서드 체이닝을 통해서 stream처럼 테스트 가능
+> 
+> assertThat(userList).extracting("필드 이름1")
+>       .contains("이름1", "이름2", ...)
+> 
+> (대신 extracting이나 filteredOn를 사용하고 나서, 다른 필드로 extracting 안됨 (해당 필드만 가지고 테스트))

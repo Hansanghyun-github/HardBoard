@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,6 @@ class UserControllerTest {
         // given
         Long userId = 1L;
         UserChangeNicknameRequest request = UserChangeNicknameRequest.builder()
-                .prevNickname("prev")
                 .newNickname("new")
                 .build();
 
@@ -69,15 +69,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"));
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"prev,", ",new"})
+    @Test
     @DisplayName("파라미터 한 개라도 비어있다면 비밀번호를 변경에 실패한다")
-    void failChangeNicknameFromEmptyNickname(String prevNickname, String newNickname) throws Exception {
+    void failChangeNicknameFromEmptyNickname() throws Exception {
         // given
         Long userId = 1L;
         UserChangeNicknameRequest request = UserChangeNicknameRequest.builder()
-                .prevNickname(prevNickname)
-                .newNickname(newNickname)
+                .newNickname(" ")
                 .build();
 
         // when // then

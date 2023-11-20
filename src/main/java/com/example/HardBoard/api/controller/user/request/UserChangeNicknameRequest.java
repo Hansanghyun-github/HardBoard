@@ -10,14 +10,10 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class UserChangeNicknameRequest {
     @NotBlank
-    private String prevNickname;
-
-    @NotBlank
     private String newNickname;
 
     @Builder
-    private UserChangeNicknameRequest(String prevNickname, String newNickname) {
-        this.prevNickname = prevNickname;
+    private UserChangeNicknameRequest(String newNickname) {
         this.newNickname = newNickname;
     }
 }
