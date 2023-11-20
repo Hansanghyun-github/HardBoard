@@ -5,11 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.user.request.UserChangeNicknameRequest;
 import com.example.HardBoard.api.controller.user.request.UserChangePasswordRequest;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
 import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
-import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,19 +19,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

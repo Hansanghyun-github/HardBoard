@@ -4,10 +4,9 @@ import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.auth.request.*;
 import com.example.HardBoard.api.service.auth.AuthService;
 import com.example.HardBoard.api.service.auth.MailService;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
+import com.example.HardBoard.api.service.token.response.TokenResponse;
 import com.example.HardBoard.api.service.token.TokenService;
 import com.example.HardBoard.api.service.user.UserService;
-import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @RestController
 @RequiredArgsConstructor

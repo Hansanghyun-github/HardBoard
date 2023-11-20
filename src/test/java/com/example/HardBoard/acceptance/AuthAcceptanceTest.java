@@ -10,7 +10,7 @@ import com.example.HardBoard.api.controller.auth.request.AuthLoginRequest;
 import com.example.HardBoard.api.controller.auth.request.AuthRemadeTokenRequest;
 import com.example.HardBoard.api.service.auth.MailService;
 import com.example.HardBoard.api.service.auth.request.MailCheckServiceRequest;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
+import com.example.HardBoard.api.service.token.response.TokenResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
@@ -28,8 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;

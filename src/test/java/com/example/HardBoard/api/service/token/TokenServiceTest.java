@@ -3,17 +3,15 @@ package com.example.HardBoard.api.service.token;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
+import com.example.HardBoard.api.service.token.response.TokenResponse;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.refreshToken.RefreshToken;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +26,6 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
 @Transactional

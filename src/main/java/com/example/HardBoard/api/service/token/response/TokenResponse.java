@@ -1,4 +1,4 @@
-package com.example.HardBoard.api.service.auth.response;
+package com.example.HardBoard.api.service.token.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

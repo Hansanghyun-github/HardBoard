@@ -1,22 +1,17 @@
 package com.example.HardBoard.api.controller.auth;
 
-import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.auth.request.*;
 import com.example.HardBoard.api.service.auth.AuthService;
 import com.example.HardBoard.api.service.auth.MailService;
 import com.example.HardBoard.api.service.auth.request.MailCheckServiceRequest;
-import com.example.HardBoard.api.service.auth.response.TokenResponse;
 import com.example.HardBoard.api.service.token.TokenService;
 import com.example.HardBoard.api.service.user.UserService;
-import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,11 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = {AuthController.class})
 @Import(TestSecurityConfig.class)
