@@ -31,7 +31,7 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() ->
                 new IllegalArgumentException("Invalid id"));
-        notice.setTitle(request.getTitle());
+        notice.setTitle(request.getTitle()); // TODO remove set & add edit method
         notice.setContents(request.getContents());
     }
 

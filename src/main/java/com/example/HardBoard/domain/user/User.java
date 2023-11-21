@@ -29,6 +29,8 @@ public class User extends BaseEntity {
 
     private Role role;
 
+    // TODO 하루 추천 개수를 제한하고 싶다
+
     @Builder
     private User(String email, String password, String nickname, Role role) {
         this.email = email;
