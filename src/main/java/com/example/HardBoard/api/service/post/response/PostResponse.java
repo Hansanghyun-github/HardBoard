@@ -20,6 +20,7 @@ public class PostResponse {
     private Long views;
     private Category category;
     private Long userId;
+    // TODO add user nickname
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

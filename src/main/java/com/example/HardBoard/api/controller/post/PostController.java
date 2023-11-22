@@ -24,6 +24,7 @@ public class PostController {
     private final PostService postService;
     private final PostRecommendService postRecommendService;
     private final PostUnrecommendService postUnrecommendService;
+    // TODO recommend/unrecommend도 PostService에서 처리해주는게 깔끔하지 않을까?
 
     @PostMapping("/posts")
     public ApiResponse<PostResponse> createPost(

@@ -1,4 +1,4 @@
-package com.example.HardBoard.domain.post;
+package com.example.HardBoard.domain.comment;
 
 import com.example.HardBoard.domain.user.User;
 import lombok.*;
@@ -8,11 +8,12 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "post_recommend")
+@Table(name = "comment_rnrecommend")
 @ToString
-public class PostRecommend {
-    @Id @GeneratedValue
-    @Column(name = "recommend_post_id")
+public class CommentUnrecommend {
+    @Id
+    @GeneratedValue
+    @Column(name = "comment_unrecommend_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,11 +22,12 @@ public class PostRecommend {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;
+    private Comment comment;
 
     @Builder
-    public PostRecommend(User user, Post post) {
+    public CommentUnrecommend(User user, Comment comment) {
         this.user = user;
-        this.post = post;
+        this.comment = comment;
     }
 }
+
