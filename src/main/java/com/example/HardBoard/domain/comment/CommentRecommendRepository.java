@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface CommentRecommendRepository extends JpaRepository<CommentRecommend, Long> {
     Long countByCommentId(Long commentId);
     Optional<CommentRecommend> findByCommentIdAndUserId(Long com, Long userId);
+    void deleteByUserIdAndCommentId(Long userId, Long commentId);
 }

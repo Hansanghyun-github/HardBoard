@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.controller.comment.request;
 
+import com.example.HardBoard.api.service.comment.request.CommentEditServiceRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,12 @@ public class CommentEditRequest {
     @Builder
     public CommentEditRequest(String contents) {
         this.contents = contents;
+    }
+
+    public CommentEditServiceRequest toServiceRequest(Long commentId) {
+        return CommentEditServiceRequest.builder()
+                .id(commentId)
+                .contents(contents)
+                .build();
     }
 }

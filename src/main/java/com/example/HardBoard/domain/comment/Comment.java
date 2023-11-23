@@ -50,4 +50,12 @@ public class Comment extends BaseEntity {
     public void setParent(Comment parent) {
         this.parent = parent;
     }
+
+    public void editContents(String contents) {
+        this.contents = contents;
+    }
+
+    public void delete() {
+        isDeleted = true;
+    }
 }

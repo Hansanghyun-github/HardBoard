@@ -39,8 +39,8 @@ public class CommentController {
             @PathVariable Long commentId,
             @Valid @RequestBody CommentEditRequest request
     ){
-        // TODO validate comment is authenticated user's comment
-        return null;
+        commentService.validateComment(commentId, principal.getUser());
+        return ApiResponse.ok(commentService.editComment(request.toServiceRequest(commentId)));
     }
 
     @DeleteMapping("/comments/{commentId}")
@@ -48,9 +48,9 @@ public class CommentController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId
     ){
-        // TODO validate comment is authenticated user's comment
-        // TODO not delete, only check comment's field(isDeleted), to maintain hierarchy
-        return null;
+        commentService.validateComment(commentId, principal.getUser());
+        commentService.deleteComment(commentId);
+        return ApiResponse.ok("ok");
     }
 
     @PostMapping("/comments/{commentId}/recommend")
@@ -58,7 +58,7 @@ public class CommentController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId
     ){
-        return null;
+        return ApiResponse.ok(commentRecommendService.recommendComment(commentId, principal.getUser()));
     }
 
     @DeleteMapping("/comments/{commentId}/recommend")
@@ -66,7 +66,7 @@ public class CommentController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId
     ){
-        return null;
+        return ApiResponse.ok(commentRecommendService.cancelRecommendComment(commentId, principal.getUser()));
     }
 
     @PostMapping("/comments/{commentId}/unrecommend")
@@ -74,7 +74,7 @@ public class CommentController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId
     ){
-        return null;
+        return ApiResponse.ok(commentUnrecommendService.unrecommendComment(commentId, principal.getUser()));
     }
 
     @DeleteMapping("/comments/{commentId}/unrecommend")
@@ -82,6 +82,6 @@ public class CommentController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId
     ){
-        return null;
+        return ApiResponse.ok(commentUnrecommendService.cancelUnrecommendComment(commentId, principal.getUser()));
     }
 }

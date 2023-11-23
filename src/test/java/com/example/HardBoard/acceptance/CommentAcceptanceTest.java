@@ -358,7 +358,7 @@ public class CommentAcceptanceTest {
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Can't edit other user's comment"));
+                .andExpect(jsonPath("$.message").value("Can't control other user's comment"));
     }
 
     @Test
@@ -432,12 +432,14 @@ public class CommentAcceptanceTest {
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Can't delete other user's comment"));
+                .andExpect(jsonPath("$.message").value("Can't control other user's comment"));
 
         assertThat(comment.getIsDeleted()).isFalse();
     }
 
     // TODO add test that recommend/unrecommend with wrong comment id
+
+    // TODO add test that duplicate recommed/unrecommend and duplicate cancel
 
     @Test
     @DisplayName("댓글을 추천한다")
@@ -490,7 +492,7 @@ public class CommentAcceptanceTest {
                 .andExpect(status().isOk());
 
         assertThat(commentRecommendRepository.findByCommentIdAndUserId(comment.getId(), userId)
-                .orElseThrow()).isNull();
+                        .isEmpty()).isTrue();
 
         assertThat(commentRecommendRepository.countByCommentId(comment.getId())).isEqualTo(0L);
     }
@@ -547,7 +549,7 @@ public class CommentAcceptanceTest {
 
         // then
         assertThat(commentUnrecommendRepository.findByCommentIdAndUserId(comment.getId(), userId)
-                .orElseThrow()).isNull();
+                .isEmpty()).isTrue();
 
         assertThat(commentUnrecommendRepository.countByCommentId(comment.getId())).isEqualTo(0L);
     }

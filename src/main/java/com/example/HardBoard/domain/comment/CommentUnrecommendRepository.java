@@ -10,4 +10,6 @@ public interface CommentUnrecommendRepository extends JpaRepository<CommentUnrec
     Optional<CommentUnrecommend> findByCommentIdAndUserId(Long com, Long userId);
 
     Long countByCommentId(Long commentId);
+
+    void deleteByUserIdAndCommentId(Long userId, Long commentId);
 }

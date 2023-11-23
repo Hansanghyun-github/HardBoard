@@ -19,6 +19,7 @@ public class PostRecommendService {
         return postRecommendRepository.countByPostId(postId);
     }
 
+    // TODO 추천, 비추천 중복 안되게 막아야 함 (Post, Comment 둘 다)
     public Long recommendPost(Long postId, User user) {
         postRecommendRepository.save(
                 PostRecommend.builder()
