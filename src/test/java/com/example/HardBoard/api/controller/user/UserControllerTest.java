@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 @Import(TestSecurityConfig.class)
 @WithMockUser
+@MockBean(JpaMetamodelMappingContext.class)
 class UserControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
@@ -62,7 +64,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/"+userId+"/nickname")
+        mockMvc.perform(post("/users/"+userId+"/nickname")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("200"))
@@ -79,7 +81,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/"+userId+"/nickname")
+        mockMvc.perform(post("/users/"+userId+"/nickname")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("400"))
@@ -97,7 +99,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/"+userId+"/password")
+        mockMvc.perform(post("/users/"+userId+"/password")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("200"))
@@ -116,7 +118,7 @@ class UserControllerTest {
                 .build();
         
         // when // then
-        mockMvc.perform(put("/users/"+userId+"/password")
+        mockMvc.perform(post("/users/"+userId+"/password")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("400"))
