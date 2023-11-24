@@ -2,16 +2,13 @@ package com.example.HardBoard.domain.block;
 
 import com.example.HardBoard.domain.BaseEntity;
 import com.example.HardBoard.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "comments")
+@Table(name = "blocks")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Block extends BaseEntity {
     @Id @GeneratedValue
@@ -27,4 +24,11 @@ public class Block extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "block_user_id")
     private User blockUser;
+
+    @Builder
+    public Block(String comments, User user, User blockUser) {
+        this.comments = comments;
+        this.user = user;
+        this.blockUser = blockUser;
+    }
 }

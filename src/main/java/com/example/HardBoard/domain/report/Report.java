@@ -2,10 +2,7 @@ package com.example.HardBoard.domain.report;
 
 import com.example.HardBoard.domain.BaseEntity;
 import com.example.HardBoard.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -26,6 +23,17 @@ public class Report extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "report_user_id")
-    private User blockUser;
+    @JoinColumn(name = "target_id")
+    private Long targetId;
+
+    @Enumerated(value = EnumType.STRING)
+    private ReportStatus status;
+
+    @Builder
+    public Report(String comments, User user, Long targetId, ReportStatus status) {
+        this.comments = comments;
+        this.user = user;
+        this.targetId = targetId;
+        this.status = status;
+    }
 }
