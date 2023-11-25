@@ -245,18 +245,11 @@ public class InquiryAcceptanceTest {
     @DisplayName("문의를 삭제한다")
     void deleteInquiry() throws Exception {
         // given
-        User anotherUser = userRepository.save(
-                User.builder()
-                        .email("Anotheremail@email")
-                        .password(passwordEncoder.encode("password"))
-                        .nickname("husiAnother")
-                        .build());
-
         Long inquiryId = inquiryRepository.save(
                 Inquiry.builder()
                         .title("title")
                         .contents("contents")
-                        .user(anotherUser)
+                        .user(user)
                         .build()
         ).getId();
 
@@ -282,6 +275,33 @@ public class InquiryAcceptanceTest {
     }
 
     @Test
+    @DisplayName("자신의 문의만 삭제할 수 있다")
+    void deleteOtherUserInquiry() throws Exception {
+        // given
+        User anotherUser = userRepository.save(
+                User.builder()
+                        .email("Anotheremail@email")
+                        .password(passwordEncoder.encode("password"))
+                        .nickname("husiAnother")
+                        .build());
+
+        Long inquiryId = inquiryRepository.save(
+                Inquiry.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(anotherUser)
+                        .build()
+        ).getId();
+
+        // when // then
+        mockMvc.perform(delete("/inquiries/" + inquiryId)
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Can't control other user's inquiry"));
+    }
+
+    @Test
     @DisplayName("문의에 답변한다")
     @WithMockUser(roles = {"ADMIN"})
     void respondInquiry() throws Exception {
@@ -299,7 +319,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when
-        String content = mockMvc.perform(post("/adnmin/inquiries/" + inquiryId)
+        String content = mockMvc.perform(post("/admin/inquiries/" + inquiryId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -333,7 +353,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when
-        mockMvc.perform(post("/adnmin/inquiries/" + inquiryId)
+        mockMvc.perform(post("/admin/inquiries/" + inquiryId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -349,7 +369,7 @@ public class InquiryAcceptanceTest {
                 .build();
         
         // when // then
-        mockMvc.perform(post("/adnmin/inquiries/" + 1L)
+        mockMvc.perform(post("/admin/inquiries/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

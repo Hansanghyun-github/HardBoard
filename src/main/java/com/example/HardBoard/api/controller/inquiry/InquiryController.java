@@ -3,6 +3,8 @@ package com.example.HardBoard.api.controller.inquiry;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.inquiry.request.InquiryEditRequest;
 import com.example.HardBoard.api.controller.inquiry.request.InquiryRegisterRequest;
+import com.example.HardBoard.api.controller.inquiry.request.InquiryRespondRequest;
+import com.example.HardBoard.api.service.inquiry.InquiryService;
 import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class InquiryController {
+    private final InquiryService inquiryService;
 
     @PostMapping("/inquiries")
     public ApiResponse<InquiryResponse> registerInquiry(
             @AuthenticationPrincipal PrincipalDetails principal,
             @Valid @RequestBody InquiryRegisterRequest request
     ){
-        return null;
+        return ApiResponse.ok(inquiryService.registerInquiry(request
+                .toServiceRequest(principal.getUser())));
     }
 
     @PostMapping("/inquiries/{inquiryId}")
@@ -32,7 +36,8 @@ public class InquiryController {
             @PathVariable Long inquiryId,
             @Valid @RequestBody InquiryEditRequest request
     ){
-        return null;
+        inquiryService.validateInquiry(inquiryId, principal.getUser());
+        return ApiResponse.ok(inquiryService.editInquiry(request.toServiceRequest(inquiryId)));
     }
 
     @DeleteMapping("/inquiries/{inquiryId}")
@@ -40,7 +45,9 @@ public class InquiryController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long inquiryId
     ){
-        return null;
+        inquiryService.validateInquiry(inquiryId, principal.getUser());
+        inquiryService.deleteInquiry(inquiryId);
+        return ApiResponse.ok("ok");
     }
 
     @GetMapping("/inquiries") // TODO 조회 테스트는 나중에 - 페이징 처리
@@ -50,10 +57,11 @@ public class InquiryController {
         return null;
     }
 
-    @PostMapping("/admin/inquires/{inquiryId}")
+    @PostMapping("/admin/inquiries/{inquiryId}")
     public ApiResponse<InquiryResponse> respondInquiry(
-            @PathVariable Long inquiryId
+            @PathVariable Long inquiryId,
+            @Valid @RequestBody InquiryRespondRequest request
     ){
-        return null;
+        return ApiResponse.ok(inquiryService.respondInquiry(request.toServiceRequest(inquiryId)));
     }
 }

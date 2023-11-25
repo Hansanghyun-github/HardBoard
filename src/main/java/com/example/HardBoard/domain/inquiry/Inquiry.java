@@ -32,5 +32,15 @@ public class Inquiry extends BaseEntity {
         this.title = title;
         this.contents = contents;
         this.user = user;
+        this.response = "default";
+    }
+
+    public void edit(String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+    }
+
+    public void respond(String response) {
+        this.response = response;
     }
 }
