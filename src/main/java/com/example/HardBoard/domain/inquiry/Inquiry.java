@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "comments")
+@Table(name = "inquiries")
 @ToString(exclude = {"user"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Inquiry extends BaseEntity {

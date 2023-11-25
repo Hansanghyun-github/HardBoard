@@ -27,6 +27,7 @@ public class User extends BaseEntity {
 
     private String nickname;
 
+    @Enumerated(value = EnumType.STRING)
     private Role role;
 
     // TODO 하루 추천 개수를 제한하고 싶다

@@ -8,8 +8,9 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "comments")
+@Table(name = "reports")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Report extends BaseEntity {
     @Id
     @GeneratedValue
@@ -22,15 +23,15 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_id")
+    @Column(name = "target_id")
     private Long targetId;
 
+    @Column(name = "target_status")
     @Enumerated(value = EnumType.STRING)
-    private ReportStatus status;
+    private TargetStatus status;
 
     @Builder
-    public Report(String comments, User user, Long targetId, ReportStatus status) {
+    public Report(String comments, User user, Long targetId, TargetStatus status) {
         this.comments = comments;
         this.user = user;
         this.targetId = targetId;
