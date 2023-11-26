@@ -7,15 +7,16 @@ import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.comment.Comment;
 import com.example.HardBoard.domain.comment.CommentRepository;
+import com.example.HardBoard.domain.post.Category;
 import com.example.HardBoard.domain.post.Post;
 import com.example.HardBoard.domain.post.PostRepository;
 import com.example.HardBoard.domain.report.Report;
 import com.example.HardBoard.domain.report.ReportRepository;
-import com.example.HardBoard.domain.report.ReportStatus;
+import com.example.HardBoard.domain.report.TargetStatus;
+import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.*;
@@ -67,6 +69,7 @@ public class ReportAcceptanceTest {
                         .email("email@email")
                         .password(passwordEncoder.encode("password"))
                         .nickname("husi")
+                        .role(Role.ROLE_USER)
                         .build());
         userId = user.getId();
         accessToken = JwtProperties.TOKEN_PREFIX +
@@ -103,7 +106,7 @@ public class ReportAcceptanceTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(reportRepository.findByStatusAndTargetId(ReportStatus.POST, postId).isPresent()).isTrue();
+        assertThat(reportRepository.findByStatusAndTargetId(TargetStatus.POST, postId).isPresent()).isTrue();
 
     }
 
@@ -121,7 +124,8 @@ public class ReportAcceptanceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid postId"));
     }
     
     @Test
@@ -141,6 +145,8 @@ public class ReportAcceptanceTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Autowired
+    EntityManager em;
     @Test
     @DisplayName("댓글을 신고한다")
     void reportComment() throws Exception {
@@ -149,22 +155,27 @@ public class ReportAcceptanceTest {
                 Post.builder()
                         .title("title")
                         .contents("contents")
+                        .category(Category.Chat)
                         .user(user)
                         .build()
         );
         Long postId = post.getId();
 
-        Long commentId = commentRepository.save(
-                Comment.builder()
-                        .contents("conts")
-                        .user(user)
-                        .post(post)
-                        .build()
-        ).getId();
+        Comment comment = Comment.builder()
+                .contents("conts")
+                .user(user)
+                .post(post)
+                .build();
+        comment.setParent();
+        Long commentId = commentRepository.save(comment).getId();
 
         ReportRequest request = ReportRequest.builder()
                 .comments("comments")
                 .build();
+
+        em.flush();
+
+        System.out.println("----------------- after flush --------------------");
 
         // when
         mockMvc.perform(post("/comments/reports/" + commentId)
@@ -175,7 +186,7 @@ public class ReportAcceptanceTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(reportRepository.findByStatusAndTargetId(ReportStatus.COMMENT, postId).isPresent()).isTrue();
+        assertThat(reportRepository.findByStatusAndTargetId(TargetStatus.COMMENT, commentId).isPresent()).isTrue();
     }
 
     @Test
@@ -187,12 +198,13 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/comments/reports/" + 1L)
+        mockMvc.perform(post("/comments/reports/" + 0L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid commentId"));
     }
 
     @Test
@@ -226,7 +238,7 @@ public class ReportAcceptanceTest {
 
         Long reportId = reportRepository.save(
                 Report.builder()
-                        .status(ReportStatus.POST)
+                        .status(TargetStatus.POST)
                         .targetId(postId)
                         .comments("comments")
                         .user(user)
@@ -234,7 +246,7 @@ public class ReportAcceptanceTest {
         ).getId();
 
         // when // then
-        mockMvc.perform(delete("/comments/reports/" + reportId)
+        mockMvc.perform(delete("/reports/" + reportId)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isOk());
@@ -256,7 +268,7 @@ public class ReportAcceptanceTest {
 
         Long reportId = reportRepository.save(
                 Report.builder()
-                        .status(ReportStatus.POST)
+                        .status(TargetStatus.POST)
                         .targetId(postId)
                         .comments("comments")
                         .user(user)
@@ -266,7 +278,7 @@ public class ReportAcceptanceTest {
         Long wrongReportId = reportId + 1L;
 
         // when // then
-        mockMvc.perform(delete("/comments/reports/" + wrongReportId)
+        mockMvc.perform(delete("/reports/" + wrongReportId)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isBadRequest());
@@ -295,7 +307,7 @@ public class ReportAcceptanceTest {
 
         Long reportId = reportRepository.save(
                 Report.builder()
-                        .status(ReportStatus.POST)
+                        .status(TargetStatus.POST)
                         .targetId(postId)
                         .comments("comments")
                         .user(anotherUser)
@@ -303,7 +315,7 @@ public class ReportAcceptanceTest {
         ).getId();
 
         // when // then
-        mockMvc.perform(delete("/comments/reports/" + reportId)
+        mockMvc.perform(delete("/reports/" + reportId)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isBadRequest())

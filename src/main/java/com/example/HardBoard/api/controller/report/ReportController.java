@@ -2,10 +2,11 @@ package com.example.HardBoard.api.controller.report;
 
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.report.request.ReportRequest;
+import com.example.HardBoard.api.service.report.ReportService;
 import com.example.HardBoard.api.service.report.response.ReportResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
+import com.example.HardBoard.domain.report.TargetStatus;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ReportController {
+    private final ReportService reportService;
 
     @PostMapping("/posts/reports/{postId}")
     public ApiResponse<String> reportPost(
@@ -24,7 +26,9 @@ public class ReportController {
             @PathVariable Long postId,
             @Valid @RequestBody ReportRequest request
     ) {
-        return null;
+        reportService.validateTarget(TargetStatus.POST, postId);
+        reportService.createReport(request.toServiceRequest(principal.getUser(), postId, TargetStatus.POST));
+        return ApiResponse.ok("ok");
     } // 신고하고 신고글 안봐도 되서 그냥 String으로 반환 함
 
     @PostMapping("/comments/reports/{commentId}")
@@ -33,7 +37,9 @@ public class ReportController {
             @PathVariable Long commentId,
             @Valid @RequestBody ReportRequest request
     ) {
-        return null;
+        reportService.validateTarget(TargetStatus.COMMENT, commentId);
+        reportService.createReport(request.toServiceRequest(principal.getUser(), commentId, TargetStatus.COMMENT));
+        return ApiResponse.ok("ok");
     }
 
     @DeleteMapping("/reports/{reportId}")
@@ -41,7 +47,9 @@ public class ReportController {
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long reportId
     ) {
-        return null;
+        reportService.validateTarget(reportId, principal.getUser());
+        reportService.cancelReport(reportId);
+        return ApiResponse.ok("ok");
     }
 
     @GetMapping("/reports")
