@@ -169,3 +169,15 @@ EntityManager를 통해, 일일이 flush 해주면서 정확히 어디서 오류
 
 ---
 
+회원가입 수행할 때, 이메일 또는 닉네임이 중복될 수 있음  
+이를 DataIntegrityViolationException을 이용해서 예외 처리하려고 했는데,  
+이메일이 중복된 것인지, 닉네임이 중복된 것인지 확인이 힘들다.  
+(에러 메시지를 통해 확인 가능하지만 API Response로 보내주기는 별로인 듯하다)
+
+> DataIntegrityViolationException으로 처리하지 않고,  
+> DB에 저장하기 전에, 해당 이메일이나 닉네임에 해당하는 유저있는지 미리 검사한다.
+>
+> -> 에러 처리하기 편하다.
+
+---
+

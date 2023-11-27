@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -69,5 +70,61 @@ class UserRepositoryTest {
 
         // when // then
         assertThat(userRepository.existsByEmail(email+"fds")).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크")
+    void checkEmailDuplicate() throws Exception {
+        // given
+
+        String email = "email@email";
+        String nickname1 = "nickname1";
+        String nickname2 = "nickname2";
+        User user1 = User.builder()
+                .email(email)
+                .password("password")
+                .nickname(nickname1)
+                .role(Role.ROLE_USER)
+                .build();
+        userRepository.save(user1);
+
+        User user2 = User.builder()
+                .email(email)
+                .password("password")
+                .nickname(nickname1)
+                .role(Role.ROLE_USER)
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userRepository.save(user2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 체크")
+    void checkNicknameDuplicate() throws Exception {
+        // given
+
+        String email1 = "email1@email";
+        String email2 = "email2@email";
+        String nickname = "nickname";
+        User user1 = User.builder()
+                .email(email1)
+                .password("password")
+                .nickname(nickname)
+                .role(Role.ROLE_USER)
+                .build();
+        userRepository.save(user1);
+
+        User user2 = User.builder()
+                .email(email2)
+                .password("password")
+                .nickname(nickname)
+                .role(Role.ROLE_USER)
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> userRepository.save(user2))
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

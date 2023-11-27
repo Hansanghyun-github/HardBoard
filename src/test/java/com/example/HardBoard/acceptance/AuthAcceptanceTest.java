@@ -14,6 +14,7 @@ import com.example.HardBoard.api.service.token.response.TokenResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.refreshToken.RefreshTokenRepository;
+import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +34,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -79,6 +81,73 @@ public class AuthAcceptanceTest {
         assertThat(user.getNickname()).isEqualTo("husi");
         assertThat(passwordEncoder
                 .matches("password", user.getPassword())).isTrue();
+    }
+
+    @Test
+    @DisplayName("중복된 이메일으로는 회원가입할 수 없다")
+    void joinWithDuplicateEmail() throws Exception {
+        // given
+        String email = "email@email";
+
+        userRepository.save(
+                User.builder()
+                        .email(email)
+                        .nickname("nickname")
+                        .password(passwordEncoder.encode("password1"))
+                        .role(Role.ROLE_USER)
+                        .build()
+        );
+
+        AuthJoinRequest joinRequest = AuthJoinRequest.builder()
+                .email(email)
+                .password("password")
+                .nickname("husi")
+                .authNumber("283")
+                .build();
+
+        when(mailService.isCorrectNumber(any())).thenReturn(true);
+
+        // when // then
+        mockMvc.perform(
+                post("/auth/join")
+                        .content(objectMapper.writeValueAsString(joinRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("email is duplicated"));
+    }
+
+    @Test
+    @DisplayName("닉네임이 겹치면 회원가입 못한다")
+    void joinWithDuplicateNickname() throws Exception {
+        // given
+        String email = "email@email";
+        String nickname = "nickname";
+
+        userRepository.save(
+                User.builder()
+                        .email(email)
+                        .nickname(nickname)
+                        .password(passwordEncoder.encode("password1"))
+                        .role(Role.ROLE_USER)
+                        .build()
+        );
+
+        AuthJoinRequest joinRequest = AuthJoinRequest.builder()
+                .email(email+"e")
+                .password("password")
+                .nickname(nickname)
+                .authNumber("283")
+                .build();
+
+        when(mailService.isCorrectNumber(any())).thenReturn(true);
+
+        // when // then
+        mockMvc.perform(
+                        post("/auth/join")
+                                .content(objectMapper.writeValueAsString(joinRequest))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("nickname is duplicated"));
     }
 
     @Test

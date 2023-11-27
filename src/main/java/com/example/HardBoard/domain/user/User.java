@@ -25,6 +25,7 @@ public class User extends BaseEntity {
 
     private String password;
 
+    @Column(unique = true)
     private String nickname;
 
     @Enumerated(value = EnumType.STRING)

@@ -28,6 +28,7 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -109,6 +110,25 @@ public class UserAcceptanceTest {
                 .orElseThrow().getNickname())
                 .isNotEqualTo(prevNickname)
                 .isEqualTo(newNickname);
+    }
+
+    @Test
+    @DisplayName("중복된 닉네임으로 변경할 수 없다")
+    void changeDuplicateNickname() throws Exception {
+        // given
+        Long userId = user.getId();
+        String prevNickname = user.getNickname();
+        UserChangeNicknameRequest request = UserChangeNicknameRequest.builder()
+                .newNickname(prevNickname)
+                .build();
+
+        // when // then
+        mockMvc.perform(post("/users/" + userId + "/nickname")
+                        .header(JwtProperties.HEADER_STRING, accessToken)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("nickname is duplicated"));
     }
 
     @Test

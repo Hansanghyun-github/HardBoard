@@ -6,6 +6,7 @@ import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.domain.user.UserConverter;
 import com.example.HardBoard.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ public class UserService {
     public UserResponse createUser(
             UserCreateServiceRequest request
     ){
+        if(userRepository.existsByEmail(request.getEmail())) throw new IllegalArgumentException("email is duplicated");
+        if(userRepository.existsByNickname(request.getNickname())) throw new IllegalArgumentException("nickname is duplicated");
         return UserResponse.of(userRepository.save(userConverter.toEntity(request.toDomainRequest())));
     }
 
@@ -38,6 +41,7 @@ public class UserService {
     }
 
     public void changeNickname(Long userId, String nickname){
+        if(userRepository.existsByNickname(nickname)) throw new IllegalArgumentException("nickname is duplicated");
         userRepository.findById(userId)
                 .orElseThrow(() ->
                 new IllegalArgumentException("Invalid id"))
