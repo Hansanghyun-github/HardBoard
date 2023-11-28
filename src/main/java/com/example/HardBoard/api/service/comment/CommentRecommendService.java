@@ -19,6 +19,7 @@ public class CommentRecommendService {
     }
 
     public Long recommendComment(Long commentId, User user) {
+        if(commentRecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId)) throw new IllegalArgumentException("Can't duplicate recommend same comment");
         commentRecommendRepository.save(
                 CommentRecommend.builder()
                         .comment(commentRepository.findById(commentId)
@@ -29,6 +30,7 @@ public class CommentRecommendService {
     }
 
     public Long cancelRecommendComment(Long commentId, User user) {
+        if(commentRecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId) == false) throw new IllegalArgumentException("Didn't recommend it");
         commentRecommendRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
         return commentRecommendRepository.countByCommentId(commentId);
     }

@@ -10,10 +10,7 @@ import com.example.HardBoard.api.service.post.response.PostResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.comment.*;
-import com.example.HardBoard.domain.post.Post;
-import com.example.HardBoard.domain.post.PostRecommendRepository;
-import com.example.HardBoard.domain.post.PostRepository;
-import com.example.HardBoard.domain.post.PostUnrecommendRepository;
+import com.example.HardBoard.domain.post.*;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -466,6 +463,39 @@ public class CommentAcceptanceTest {
     }
 
     @Test
+    @DisplayName("중복 추천은 불가능하다")
+    void recommendDuplicatePost() throws Exception {
+        // given
+        Post post = postRepository.save(
+                Post.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build());
+        Comment comment = commentRepository.save(
+                Comment.builder()
+                        .contents("contents1")
+                        .post(post)
+                        .user(user)
+                        .build());
+        comment.setParent(comment);
+
+        commentRecommendRepository.save(
+                CommentRecommend.builder()
+                        .user(user)
+                        .comment(comment)
+                        .build()
+        );
+
+        // when // then
+        mockMvc.perform(post("/comments/" + comment.getId() + "/recommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Can't duplicate recommend same comment"));
+    }
+
+    @Test
     @DisplayName("댓글 추천을 취소한다")
     void cancelRecommendComment() throws Exception {
         // given
@@ -498,6 +528,17 @@ public class CommentAcceptanceTest {
     }
 
     @Test
+    @DisplayName("추천하지 않아서 삭제할 수 없다")
+    void deleteEmptyRecommend() throws Exception {
+        // when // then
+        mockMvc.perform(delete("/comments/" + 1L + "/recommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Didn't recommend it"));
+    }
+
+    @Test
     @DisplayName("댓글을 비추천한다")
     void unrecommendComment() throws Exception {
         // given
@@ -519,6 +560,39 @@ public class CommentAcceptanceTest {
                 .orElseThrow()).isNotNull();
 
         assertThat(commentUnrecommendRepository.countByCommentId(comment.getId())).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("중복 비추천은 불가능하다")
+    void unrecommendDuplicatePost() throws Exception {
+        // given
+        Post post = postRepository.save(
+                Post.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build());
+        Comment comment = commentRepository.save(
+                Comment.builder()
+                        .contents("contents1")
+                        .post(post)
+                        .user(user)
+                        .build());
+        comment.setParent(comment);
+
+        commentUnrecommendRepository.save(
+                CommentUnrecommend.builder()
+                        .user(user)
+                        .comment(comment)
+                        .build()
+        );
+
+        // when // then
+        mockMvc.perform(post("/comments/" + comment.getId() + "/unrecommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Can't duplicate unrecommend same comment"));
     }
 
     @Test
@@ -552,5 +626,16 @@ public class CommentAcceptanceTest {
                 .isEmpty()).isTrue();
 
         assertThat(commentUnrecommendRepository.countByCommentId(comment.getId())).isEqualTo(0L);
+    }
+
+    @Test
+    @DisplayName("비추천하지 않아서 삭제할 수 없다")
+    void deleteEmptyUnrecommend() throws Exception {
+        // when // then
+        mockMvc.perform(delete("/comments/" + 1L + "/unrecommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Didn't unrecommend it"));
     }
 }

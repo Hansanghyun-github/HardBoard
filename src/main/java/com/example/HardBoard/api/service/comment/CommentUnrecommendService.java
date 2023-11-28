@@ -19,6 +19,7 @@ public class CommentUnrecommendService {
     }
 
     public Long unrecommendComment(Long commentId, User user) {
+        if(commentUnrecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId)) throw new IllegalArgumentException("Can't duplicate unrecommend same comment");
         commentUnrecommendRepository.save(
                 CommentUnrecommend.builder()
                         .comment(commentRepository.findById(commentId)
@@ -29,6 +30,7 @@ public class CommentUnrecommendService {
     }
 
     public Long cancelUnrecommendComment(Long commentId, User user) {
+        if(commentUnrecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId) == false) throw new IllegalArgumentException("Didn't unrecommend it");
         commentUnrecommendRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
         return commentUnrecommendRepository.countByCommentId(commentId);
     }
