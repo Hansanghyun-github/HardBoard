@@ -181,3 +181,8 @@ EntityManager를 통해, 일일이 flush 해주면서 정확히 어디서 오류
 
 ---
 
+단일 column에 유니크 제약조건 추가하면,  
+jpa로 저장할 때 바로 exception 터지지만, (DataIntegrityViolationException)  
+복수 column에 유니크 제약조건 추가하면,  
+jpa로 저장할 때 바로 exception 터지지 않고, 트랜잭션이 끝날 때(or flush) exception이 터진다. (PersistenceException)
+

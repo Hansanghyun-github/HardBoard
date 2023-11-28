@@ -21,6 +21,7 @@ public class PostUnrecommendService {
     }
 
     public Long unrecommendPost(Long postId, User user) {
+        if(postUnrecommendRepository.existsByUserIdAndPostId(user.getId(), postId)) throw new IllegalArgumentException("Can't duplicate unrecommend same post");
         postUnrecommendRepository.save(
                 PostUnrecommend.builder()
                         .post(postRepository.findById(postId).orElseThrow(() ->
@@ -31,7 +32,7 @@ public class PostUnrecommendService {
     }
 
     public Long cancelUnrecommendPost(Long postId, User user) {
-        // TODO userId or postId가 invalid 하다면 어떻게 해야 하나 - 중복 쿼리 줄여야 함?
+        if(postUnrecommendRepository.existsByUserIdAndPostId(user.getId(), postId) == false) throw new IllegalArgumentException("Didn't unrecommend it");
         postUnrecommendRepository.deleteByUserIdAndPostId(user.getId(), postId);
         return postUnrecommendRepository.countByPostId(postId);
     }

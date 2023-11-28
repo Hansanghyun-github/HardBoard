@@ -7,6 +7,7 @@ import java.util.Optional;
 
 @Repository
 public interface PostUnrecommendRepository extends JpaRepository<PostUnrecommend, Long> {
+    public boolean existsByUserIdAndPostId(Long userId, Long postId);
     public void deleteByUserIdAndPostId(Long userId, Long postId);
 
     public Long countByPostId(Long postId);

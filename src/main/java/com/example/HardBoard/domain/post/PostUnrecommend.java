@@ -11,10 +11,12 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "unrecommend_post")
+@Table(
+        name = "post_unrecommend",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
 public class PostUnrecommend {
     @Id @GeneratedValue
-    @Column(name = "unrecommend_post_id")
+    @Column(name = "post_unrecommend_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -19,8 +19,8 @@ public class PostRecommendService {
         return postRecommendRepository.countByPostId(postId);
     }
 
-    // TODO 추천, 비추천 중복 안되게 막아야 함 (Post, Comment 둘 다)
     public Long recommendPost(Long postId, User user) {
+        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId)) throw new IllegalArgumentException("Can't duplicate recommend same post");
         postRecommendRepository.save(
                 PostRecommend.builder()
                         .post(postRepository.findById(postId).orElseThrow(() ->
@@ -31,7 +31,7 @@ public class PostRecommendService {
     }
 
     public Long cancelRecommendPost(Long postId, User user) {
-        // TODO userId or postId가 invalid 하다면 어떻게 해야 하나 - 중복 쿼리 줄여야 함?
+        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId) == false) throw new IllegalArgumentException("Didn't recommend it");
         postRecommendRepository.deleteByUserIdAndPostId(user.getId(), postId);
         return postRecommendRepository.countByPostId(postId);
     }

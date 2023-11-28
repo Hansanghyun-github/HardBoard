@@ -26,7 +26,7 @@ public class PostService {
                         request.getCategory(),
                         request.getUser()));
         return PostResponse.of(post, 0L, 0L);
-    }
+    } // TODO 자기 자신 post에 추천 막는 기능 추가
 
     public void validatePost(Long postId, User user) {
         if(postRepository.findById(postId)

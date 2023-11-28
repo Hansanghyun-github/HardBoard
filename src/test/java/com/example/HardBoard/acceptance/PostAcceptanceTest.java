@@ -365,6 +365,34 @@ public class PostAcceptanceTest {
     }
 
     @Test
+    @DisplayName("중복 추천은 불가능하다")
+    void recommendDuplicatePost() throws Exception {
+        // given
+        Post post = postRepository.save(
+                Post.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build());
+        Long postId = post.getId();
+        Long prevRecommend = postRecommendRepository.countByPostId(postId);
+
+        postRecommendRepository.save(
+                PostRecommend.builder()
+                        .user(user)
+                        .post(post)
+                        .build()
+        );
+
+        // when // then
+        mockMvc.perform(post("/posts/" + postId+"/recommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Can't duplicate recommend same post"));
+    }
+
+    @Test
     @DisplayName("post 추천을 취소한다")
     void cancelRecommendPost() throws Exception {
         // given
@@ -396,6 +424,17 @@ public class PostAcceptanceTest {
     }
 
     @Test
+    @DisplayName("추천하지 않아서 삭제할 수 없다")
+    void deleteEmptyRecommend() throws Exception {
+        // when // then
+        mockMvc.perform(delete("/posts/" + 1L+"/recommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Didn't recommend it"));
+    }
+
+    @Test
     @DisplayName("post를 비추천한다")
     void unrecommendPost() throws Exception {
         // given
@@ -419,6 +458,34 @@ public class PostAcceptanceTest {
 
         assertThat(postUnrecommendRepository.countByPostId(postId - prevUnrecommend))
                 .isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("중복 비추천은 불가능하다")
+    void unrecommendDuplicatePost() throws Exception {
+        // given
+        Post post = postRepository.save(
+                Post.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build());
+        Long postId = post.getId();
+        Long prevRecommend = postUnrecommendRepository.countByPostId(postId);
+
+        postUnrecommendRepository.save(
+                PostUnrecommend.builder()
+                        .user(user)
+                        .post(post)
+                        .build()
+        );
+
+        // when // then
+        mockMvc.perform(post("/posts/" + postId+"/unrecommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Can't duplicate unrecommend same post"));
     }
 
     @Test
@@ -449,5 +516,16 @@ public class PostAcceptanceTest {
 
         assertThat(prevUnrecommend - postUnrecommendRepository.countByPostId(postId))
                 .isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("비추천하지 않아서 삭제할 수 없다")
+    void deleteEmptyUnrecommend() throws Exception {
+        // when // then
+        mockMvc.perform(delete("/posts/" + 1L+"/unrecommend")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Didn't unrecommend it"));
     }
 }
