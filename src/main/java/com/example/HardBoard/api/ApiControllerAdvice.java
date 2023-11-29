@@ -6,6 +6,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class ApiControllerAdvice {
@@ -24,6 +25,16 @@ public class ApiControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({IllegalArgumentException.class, EmptyResultDataAccessException.class})
     public ApiResponse<Object> illegalArgumentException(IllegalArgumentException e){
+        return ApiResponse.of(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                null
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    public ApiResponse<Object> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e){
         return ApiResponse.of(
                 HttpStatus.BAD_REQUEST,
                 e.getMessage(),

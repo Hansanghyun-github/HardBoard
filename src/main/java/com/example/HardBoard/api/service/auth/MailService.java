@@ -52,6 +52,7 @@ public class MailService {
     }
 
     public String makeAuthNumber(){
-        return "" + (random.nextLong(888888) + 111111L);
+        Long nextLong = random.nextLong() % 888888L + 111111L;
+        return nextLong.toString();
     }
 }

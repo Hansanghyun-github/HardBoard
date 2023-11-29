@@ -186,3 +186,23 @@ jpa로 저장할 때 바로 exception 터지지만, (DataIntegrityViolationExcep
 복수 column에 유니크 제약조건 추가하면,  
 jpa로 저장할 때 바로 exception 터지지 않고, 트랜잭션이 끝날 때(or flush) exception이 터진다. (PersistenceException)
 
+---
+
+```
+List<BlockResponse> collect = (List<BlockResponse>) list.stream().map(d ->
+        {
+            try {
+                return objectMapper.readValue(objectMapper.writeValueAsString(d), BlockResponse.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        })
+        .collect(Collectors.toList());
+```
+
+왜 굳이 캐스팅을 해줘야 하나?
+
+---
+
+테스트 하고 출력 결과 볼 때, 일일이 pageDown 눌러서 내려가는 거 너무 귀찮다.  
+빠르게 가는 법 없나?

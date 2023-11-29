@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,12 +22,12 @@ public class BlockController {
     private final BlockService blockService;
 
     @PostMapping("/blocks/{blockUserId}")
-    public ApiResponse<BlockResponse> blockUser(
+    public ApiResponse<BlockResponse> blockUser( // TODO 유저 차단 최대 크기 제한 (100명?)
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long blockUserId,
             @Valid @RequestBody BlockRequest request
             ){
-        return ApiResponse.ok(blockService.blockUser(request.toServiceRequest(principal.getUser(), blockUserId)));
+        return ApiResponse.ok(blockService.blockUser(request.toServiceRequest(principal.getUser(), blockUserId), LocalDateTime.now()));
     }
 
     @DeleteMapping("/blocks/{blockUserId}")
@@ -37,10 +39,12 @@ public class BlockController {
         return ApiResponse.ok("ok");
     }
 
-    @GetMapping("/blocks") // TODO 페이징 처리 - 나중에 (테스트도)
+    @GetMapping("/blocks")
     public ApiResponse<List<BlockResponse>> getBlockList(
+            @RequestParam(name = "page", defaultValue = "1") int page,
             @AuthenticationPrincipal PrincipalDetails principal
     ){
-        return null;
+        if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
+        return ApiResponse.ok(blockService.getBlockList(principal.getUser().getId(), page));
     }
 }

@@ -5,12 +5,14 @@ import com.example.HardBoard.domain.user.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "blocks")
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Block extends BaseEntity {
+public class Block {
     @Id @GeneratedValue
     @Column(name = "block_id")
     private Long id;
@@ -25,10 +27,13 @@ public class Block extends BaseEntity {
     @JoinColumn(name = "block_user_id")
     private User blockUser;
 
+    private LocalDateTime createdDateTime;
+
     @Builder
-    public Block(String comments, User user, User blockUser) {
+    public Block(String comments, User user, User blockUser, LocalDateTime createdDateTime) {
         this.comments = comments;
         this.user = user;
         this.blockUser = blockUser;
+        this.createdDateTime = createdDateTime;
     }
 }

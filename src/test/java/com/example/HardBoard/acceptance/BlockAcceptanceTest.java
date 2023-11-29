@@ -12,8 +12,10 @@ import com.example.HardBoard.domain.block.Block;
 import com.example.HardBoard.domain.block.BlockRepository;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +29,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -227,9 +234,46 @@ public class BlockAcceptanceTest {
     @DisplayName("차단한 유저 리스트를 조회한다")
     void getBlockUserList() throws Exception {
         // given
+        for(int i=0;i<35;i++){
+            User blockUser = userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password("password")
+                            .nickname("nickname" + i)
+                            .build()
+            );
+            blockRepository.save(
+                    Block.builder()
+                            .user(user)
+                            .blockUser(blockUser)
+                            .comments("comments")
+                            .createdDateTime(LocalDateTime.now().minusSeconds(i))
+                            .build()
+            );
+        }
 
         // when
+        String content = mockMvc.perform(get("/blocks?page=1")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<BlockResponse> collect = (List<BlockResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), BlockResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
 
         // then
+        assertThat(collect.size()).isEqualTo(20);
+        for(int i=0;i<collect.size()-1;i++){
+            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isPositive();
+        }
     }
 }
