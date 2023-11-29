@@ -181,6 +181,12 @@ EntityManager를 통해, 일일이 flush 해주면서 정확히 어디서 오류
 
 ---
 
+cannot deserialize from object value (no delegate- or property-based creator)
+
+> 모든 클래스에는 빈 생성자를 추가해놓자
+
+---
+
 단일 column에 유니크 제약조건 추가하면,  
 jpa로 저장할 때 바로 exception 터지지만, (DataIntegrityViolationException)  
 복수 column에 유니크 제약조건 추가하면,  
@@ -206,3 +212,11 @@ List<BlockResponse> collect = (List<BlockResponse>) list.stream().map(d ->
 
 테스트 하고 출력 결과 볼 때, 일일이 pageDown 눌러서 내려가는 거 너무 귀찮다.  
 빠르게 가는 법 없나?
+
+---
+
+기본형은 getter가 적용 안되나?
+
+boolean(x), Boolean(o)
+
+---

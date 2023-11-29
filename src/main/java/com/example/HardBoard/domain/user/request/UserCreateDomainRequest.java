@@ -1,15 +1,18 @@
 package com.example.HardBoard.domain.user.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Getter
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class UserCreateDomainRequest {
     private String email;
     private String password;
     private String nickname;
+
+    @Builder
+    public UserCreateDomainRequest(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }

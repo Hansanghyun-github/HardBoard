@@ -1,13 +1,17 @@
 package com.example.HardBoard.api.service.token.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class TokenResponse {
     String accessToken;
     String refreshToken;
+
+    @Builder
+    public TokenResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 }

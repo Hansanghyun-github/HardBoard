@@ -116,9 +116,9 @@ class RefreshTokenRepositoryTest {
         // given
         User user = userRepository.save(
                 User.builder()
-                        .nickname(anyString())
-                        .email(anyString())
-                        .password(anyString())
+                        .nickname("nickname")
+                        .email("email@email")
+                        .password("password")
                         .build());
         RefreshToken token = refreshTokenRepository.save(
                 RefreshToken.builder()
@@ -144,9 +144,9 @@ class RefreshTokenRepositoryTest {
         // given
         User user = userRepository.save(
                 User.builder()
-                        .nickname(anyString())
-                        .email(anyString())
-                        .password(anyString())
+                        .nickname("nickname")
+                        .email("email@email")
+                        .password("email@email")
                         .build());
         RefreshToken token = refreshTokenRepository.save(
                 RefreshToken.builder()

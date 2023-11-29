@@ -22,7 +22,7 @@ class AuthNumberRepositoryTest {
         AuthNumber authNumber = authNumberRepository.save(
                 AuthNumber.builder()
                         .email(email)
-                        .authNum(anyString())
+                        .authNum("283")
                         .build());
         Long id = authNumber.getId();
 
@@ -41,7 +41,7 @@ class AuthNumberRepositoryTest {
         authNumberRepository.save(
                 AuthNumber.builder()
                         .email(email)
-                        .authNum(anyString())
+                        .authNum("283")
                         .build());
 
         // when // then
@@ -56,7 +56,7 @@ class AuthNumberRepositoryTest {
         authNumberRepository.save(
                 AuthNumber.builder()
                         .email(email)
-                        .authNum(anyString())
+                        .authNum("283")
                         .build());
 
         // when // then

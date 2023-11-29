@@ -14,6 +14,7 @@ import com.example.HardBoard.domain.inquiry.Inquiry;
 import com.example.HardBoard.domain.inquiry.InquiryRepository;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -373,5 +377,72 @@ public class InquiryAcceptanceTest {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @DisplayName("문의 리스트를 조회한다")
+    void getInquiryList() throws Exception {
+        // given
+        for(int i=0;i<35;i++){
+            inquiryRepository.save(
+                    Inquiry.builder()
+                            .title("title" + i)
+                            .contents("contents" + i)
+                            .user(user)
+                            .build()
+            );
+        }
+
+        // when
+        String content = mockMvc.perform(get("/inquiries?page=1")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<InquiryResponse> collect = (List<InquiryResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), InquiryResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+
+        // then
+        assertThat(collect.size()).isEqualTo(20);
+        for(int i=0;i<collect.size()-1;i++){
+            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isNotNegative();
+        }
+    }
+
+    @Test
+    @DisplayName("문의 조회")
+    void getInquiry() throws Exception {
+        // given
+        Inquiry inquiry = inquiryRepository.save(
+                Inquiry.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build()
+        );
+
+        // when
+        String content = mockMvc.perform(get("/inquiries/" + inquiry.getId())
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse apiResponse = objectMapper.readValue(content, ApiResponse.class);
+        InquiryResponse inquiryResponse = objectMapper.readValue(objectMapper
+                .writeValueAsString(apiResponse.getData()), InquiryResponse.class);
+
+        // then
+        assertThat(inquiryResponse.getTitle()).isEqualTo("title");
+        assertThat(inquiryResponse.getContents()).isEqualTo("contents");
+        assertThat(inquiryResponse.getIsResponded()).isEqualTo(false);
     }
 }

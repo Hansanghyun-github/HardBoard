@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class BlockController {
+public class  BlockController {
     private final BlockService blockService;
 
     @PostMapping("/blocks/{blockUserId}")
@@ -41,8 +41,8 @@ public class BlockController {
 
     @GetMapping("/blocks")
     public ApiResponse<List<BlockResponse>> getBlockList(
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @AuthenticationPrincipal PrincipalDetails principal
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam(name = "page", defaultValue = "1") int page
     ){
         if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
         return ApiResponse.ok(blockService.getBlockList(principal.getUser().getId(), page));

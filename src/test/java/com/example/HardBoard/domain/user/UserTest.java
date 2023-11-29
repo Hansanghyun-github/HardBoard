@@ -22,8 +22,8 @@ class UserTest {
         String nickname = "nickname1";
 
         User user = userConverter.toEntity(UserCreateDomainRequest.builder()
-                .email(anyString())
-                .password(anyString())
+                .email("email@email")
+                .password(passwordEncoder.encode("password"))
                 .nickname(nickname)
                 .build());
 
@@ -43,9 +43,9 @@ class UserTest {
         // given
         String password = "password1";
         User user = userConverter.toEntity(UserCreateDomainRequest.builder()
-                .email(anyString())
+                .email("email@email")
                 .password(password)
-                .nickname(anyString())
+                .nickname("nickname")
                 .build());
 
         String newPassword = "newPassword";
@@ -65,9 +65,9 @@ class UserTest {
         // given
         String password = "password1";
         User user = userConverter.toEntity(UserCreateDomainRequest.builder()
-                .email(anyString())
+                .email("email@email")
                 .password(password)
-                .nickname(anyString())
+                .nickname("nickname")
                 .build());
 
         
@@ -81,9 +81,9 @@ class UserTest {
         // given
         String password = "password1";
         User user = userConverter.toEntity(UserCreateDomainRequest.builder()
-                .email(anyString())
+                .email("email@email")
                 .password(password)
-                .nickname(anyString())
+                .nickname("nickname")
                 .build());
 
         // when // then

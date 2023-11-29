@@ -3,8 +3,10 @@ package com.example.HardBoard.api.service.notice.response;
 import com.example.HardBoard.domain.notice.Notice;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class NoticeResponse {
     private Long id;
     private String title;
