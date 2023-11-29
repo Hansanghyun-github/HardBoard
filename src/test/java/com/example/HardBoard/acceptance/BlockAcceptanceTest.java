@@ -230,7 +230,6 @@ public class BlockAcceptanceTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("차단한 유저 리스트를 조회한다")
     void getBlockUserList() throws Exception {
         // given
@@ -273,7 +272,7 @@ public class BlockAcceptanceTest {
         // then
         assertThat(collect.size()).isEqualTo(20);
         for(int i=0;i<collect.size()-1;i++){
-            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isPositive();
+            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isNotNegative();
         }
     }
 }

@@ -54,8 +54,12 @@ public class ReportController {
 
     @GetMapping("/reports")
     public ApiResponse<List<ReportResponse>> getReportList(
-            @AuthenticationPrincipal PrincipalDetails principal
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam(name = "page", defaultValue = "1") int page
     ){
-        return null;
-    } // TODO 페이징처리 하고 테스트
+        if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
+        return ApiResponse.ok(reportService.getBlockList(principal.getUser().getId(), page));
+    }
+    // TODO Block, Report, Inquiry getXXXList 페이징 테스트
+    // TODO Response에 entity 없는지 체크
 }

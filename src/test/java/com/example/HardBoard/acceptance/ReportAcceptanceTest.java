@@ -2,7 +2,10 @@ package com.example.HardBoard.acceptance;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.report.request.ReportRequest;
+import com.example.HardBoard.api.service.block.response.BlockResponse;
+import com.example.HardBoard.api.service.report.response.ReportResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.comment.Comment;
@@ -16,6 +19,7 @@ import com.example.HardBoard.domain.report.TargetStatus;
 import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +34,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -322,5 +329,58 @@ public class ReportAcceptanceTest {
                 .andExpect(jsonPath("$.message").value("Can't delete other user's report"));
 
         assertThat(reportRepository.findById(reportId).isEmpty()).isFalse();
+    }
+
+    @Test
+    @DisplayName("신고 리스트 조회")
+    void getReportList() throws Exception {
+        // given
+        User anotherUser = userRepository.save(
+                User.builder()
+                        .email("Anotheremail@email")
+                        .password(passwordEncoder.encode("password"))
+                        .nickname("husiAnother")
+                        .build());
+        for(int i=0;i<35;i++){
+            Long postId = postRepository.save(
+                    Post.builder()
+                            .title("title" + i)
+                            .contents("contents" + i)
+                            .user(anotherUser)
+                            .build()
+            ).getId();
+
+            reportRepository.save(
+                    Report.builder()
+                            .status(TargetStatus.POST)
+                            .targetId(postId)
+                            .comments("comments")
+                            .user(user)
+                            .build());
+        }
+
+        // when
+        String content = mockMvc.perform(get("/reports?page=1")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<ReportResponse> collect = (List<ReportResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), ReportResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }) // TODO stream 내에서는 try-catch를 따로 해줘야 하나?
+                .collect(Collectors.toList());
+
+
+        // then
+        assertThat(collect.size()).isEqualTo(20);
+        for(int i=0;i<collect.size()-1;i++){
+            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isNotNegative();
+        }
     }
 }

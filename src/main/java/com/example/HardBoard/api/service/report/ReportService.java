@@ -1,6 +1,8 @@
 package com.example.HardBoard.api.service.report;
 
+import com.example.HardBoard.api.service.block.response.BlockResponse;
 import com.example.HardBoard.api.service.report.request.ReportServiceRequest;
+import com.example.HardBoard.api.service.report.response.ReportResponse;
 import com.example.HardBoard.domain.comment.CommentRepository;
 import com.example.HardBoard.domain.post.PostRepository;
 import com.example.HardBoard.domain.report.Report;
@@ -9,8 +11,12 @@ import com.example.HardBoard.domain.report.TargetStatus;
 import com.example.HardBoard.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -47,5 +53,13 @@ public class ReportService {
 
     public void cancelReport(Long reportId) {
         reportRepository.deleteById(reportId);
+    }
+
+    public List<ReportResponse> getBlockList(Long userId, int page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+                Sort.by(Sort.Direction.DESC, "createdDateTime"));
+        return reportRepository.findByUserId(userId, pageRequest)
+                .map(ReportResponse::of)
+                .getContent();
     }
 }
