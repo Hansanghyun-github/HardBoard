@@ -7,12 +7,14 @@ import com.example.HardBoard.api.controller.inquiry.request.InquiryRespondReques
 import com.example.HardBoard.api.service.inquiry.InquiryService;
 import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
+import com.example.HardBoard.domain.inquiry.Inquiry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -50,18 +52,29 @@ public class InquiryController {
         return ApiResponse.ok("ok");
     }
 
-    @GetMapping("/inquiries") // TODO 조회 테스트는 나중에 - 페이징 처리
-    public ApiResponse<List<InquiryResponse>> getInquiryList(
-            @AuthenticationPrincipal PrincipalDetails principal
-    ){
-        return null;
-    }
-
     @PostMapping("/admin/inquiries/{inquiryId}")
     public ApiResponse<InquiryResponse> respondInquiry(
             @PathVariable Long inquiryId,
             @Valid @RequestBody InquiryRespondRequest request
     ){
-        return ApiResponse.ok(inquiryService.respondInquiry(request.toServiceRequest(inquiryId)));
+        return ApiResponse.ok(inquiryService.respondInquiry(request.toServiceRequest(inquiryId), LocalDateTime.now()));
+    }
+
+    @GetMapping("/inquiries")
+    public ApiResponse<List<InquiryResponse>> getInquiryList(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam(name = "page", defaultValue = "1") int page
+    ){
+        if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
+        return ApiResponse.ok(inquiryService.getInquiryList(principal.getUser().getId(), page));
+    }
+
+    @GetMapping("/inquiries/{inquiryId}")
+    public ApiResponse<InquiryResponse> getInquiry(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @PathVariable Long inquiryId
+    ) {
+        inquiryService.validateInquiry(inquiryId, principal.getUser());
+        return ApiResponse.ok(inquiryService.getInquiry(inquiryId));
     }
 }
