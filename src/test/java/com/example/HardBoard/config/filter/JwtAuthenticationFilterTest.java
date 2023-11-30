@@ -5,6 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.HardBoard.config.auth.JwtProperties;
+import com.example.HardBoard.config.auth.PrincipalDetails;
+import com.example.HardBoard.domain.user.Role;
 import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -18,6 +20,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -35,6 +41,8 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
     @InjectMocks
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Mock
     HttpServletRequest request;
     @Mock
@@ -42,6 +50,51 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
     @Mock
     FilterChain filterChain;
 
+    @Test
+    @DisplayName("jwt 액세스 토큰을 이용해 인증한다")
+    void authenticationUsingJwtAccessToken() throws Exception {
+        // given
+        String nickname = "husi";
+        String email = "email@email";
+        String password = "password";
+
+        User user = User.builder()
+                .email(email)
+                .nickname(nickname)
+                .password(passwordEncoder.encode(password))
+                .role(Role.ROLE_USER)
+                .build();
+
+        String accessToken = JWT.create()
+                .withSubject(nickname)
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME))
+                .withClaim("email", email)
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        Mockito.doReturn(Optional.of(user))
+                .when(userRepository)
+                .findByEmail(ArgumentMatchers.anyString());
+
+        Mockito.doReturn(JwtProperties.TOKEN_PREFIX + accessToken)
+                .when(request)
+                .getHeader(JwtProperties.HEADER_STRING);
+
+        // when
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
+
+        // then
+        Mockito.verify(filterChain, Mockito.times(1)).doFilter(request, response);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isNotNull();
+        PrincipalDetails principal = (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        assertThat(principal.getUser()).satisfies(u -> {
+            assertThat(u.getEmail()).isEqualTo(email);
+            assertThat(u.getNickname()).isEqualTo(nickname);
+            assertThat(passwordEncoder.matches(password, u.getPassword())).isTrue();
+                });
+    }
+    
     @Test
     @DisplayName("Authorization 헤더가 비어 있다면 그냥 통과한다")
     void emptyAuthorizationHeaderShouldPass() throws Exception {
@@ -60,7 +113,7 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
                 .getHeader(JwtProperties.HEADER_STRING);
 
         // when // then
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> jwtAuthenticationFilter.doFilter(request, response, filterChain))
                         .isInstanceOf(IllegalArgumentException.class)
                                 .hasMessage("token prefix is wrong");
@@ -87,7 +140,7 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
                 .getHeader(JwtProperties.HEADER_STRING);
 
         // when // then
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                         () -> jwtAuthenticationFilter.doFilter(request, response, filterChain))
                 .isInstanceOf(SignatureVerificationException.class)
                 .hasMessage("The Token's Signature resulted invalid when verified using the Algorithm: HmacSHA512");
@@ -114,7 +167,7 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
                 .getHeader(JwtProperties.HEADER_STRING);
 
         // when // then
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                         () -> jwtAuthenticationFilter.doFilter(request, response, filterChain))
                 .isInstanceOf(TokenExpiredException.class)
                 .hasMessageStartingWith("The Token has expired");
@@ -141,7 +194,7 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
                 .getHeader(JwtProperties.HEADER_STRING);
 
         // when // then
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                         () -> jwtAuthenticationFilter.doFilter(request, response, filterChain))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("Email claim is null");
@@ -156,13 +209,6 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
         String nickname = "husi";
         String email = "email@email";
         String password = "password";
-
-        userRepository.save(
-                User.builder()
-                        .email(email)
-                        .nickname(nickname)
-                        .password(password)
-                        .build());
 
         String accessToken = JWT.create()
                 .withSubject(nickname)
@@ -179,7 +225,7 @@ class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
                 .findByEmail(ArgumentMatchers.anyString());
 
         // when // then
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                         () -> jwtAuthenticationFilter.doFilter(request, response, filterChain))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("Email is wrong");
