@@ -45,6 +45,6 @@ public class  BlockController {
             @RequestParam(name = "page", defaultValue = "1") int page
     ){
         if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
-        return ApiResponse.ok(blockService.getBlockList(principal.getUser().getId(), page));
+        return ApiResponse.ok(blockService.getBlockList(principal.getUser().getId(), page - 1));
     }
 }

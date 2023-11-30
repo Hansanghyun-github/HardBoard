@@ -47,6 +47,6 @@ public class NoticeController {
             @RequestParam(name = "page", defaultValue = "1") int page
     ){
         if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
-        return ApiResponse.ok(noticeService.findAll(page));
+        return ApiResponse.ok(noticeService.getNoticeList(page - 1));
     }
 }

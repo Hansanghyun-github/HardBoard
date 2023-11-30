@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -48,8 +47,8 @@ public class NoticeService {
                 new IllegalArgumentException("Invalid id")));
     }
 
-    public List<NoticeResponse> findAll(int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+    public List<NoticeResponse> getNoticeList(int page) {
+        PageRequest pageRequest = PageRequest.of(page, 20,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return noticeRepository.findAll(pageRequest)
                 .map(NoticeResponse::of)

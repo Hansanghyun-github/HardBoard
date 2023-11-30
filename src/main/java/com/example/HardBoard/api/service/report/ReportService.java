@@ -56,7 +56,7 @@ public class ReportService {
     }
 
     public List<ReportResponse> getBlockList(Long userId, int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+        PageRequest pageRequest = PageRequest.of(page, 20,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return reportRepository.findByUserId(userId, pageRequest)
                 .map(ReportResponse::of)

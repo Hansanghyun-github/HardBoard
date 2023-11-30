@@ -63,7 +63,7 @@ public class InquiryService {
     }
 
     public List<InquiryResponse> getInquiryList(Long userId, int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+        PageRequest pageRequest = PageRequest.of(page, 20,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return inquiryRepository.findByUserId(userId, pageRequest)
                 .map(InquiryResponse::of)

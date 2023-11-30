@@ -46,7 +46,7 @@ public class BlockService {
     }
 
     public List<BlockResponse> getBlockList(Long userId, int page) {
-        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+        PageRequest pageRequest = PageRequest.of(page, 20,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return blockRepository.findByUserId(userId, pageRequest)
                 .map(BlockResponse::of)

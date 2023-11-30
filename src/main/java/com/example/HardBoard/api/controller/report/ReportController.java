@@ -58,7 +58,7 @@ public class ReportController {
             @RequestParam(name = "page", defaultValue = "1") int page
     ){
         if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
-        return ApiResponse.ok(reportService.getBlockList(principal.getUser().getId(), page));
+        return ApiResponse.ok(reportService.getBlockList(principal.getUser().getId(), page - 1));
     }
     // TODO Block, Report, Inquiry getXXXList 페이징 테스트
     // TODO Response에 entity 없는지 체크
