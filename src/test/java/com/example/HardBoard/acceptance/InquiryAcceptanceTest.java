@@ -6,7 +6,6 @@ import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.inquiry.request.InquiryEditRequest;
 import com.example.HardBoard.api.controller.inquiry.request.InquiryRegisterRequest;
 import com.example.HardBoard.api.controller.inquiry.request.InquiryRespondRequest;
-import com.example.HardBoard.api.service.block.response.BlockResponse;
 import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;

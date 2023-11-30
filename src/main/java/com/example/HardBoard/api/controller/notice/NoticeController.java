@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -39,5 +40,13 @@ public class NoticeController {
     ){
         noticeService.deleteNotice(noticeId);
         return ApiResponse.ok("ok");
+    }
+
+    @GetMapping("/public/notices")
+    public ApiResponse<List<NoticeResponse>> getNoticeList(
+            @RequestParam(name = "page", defaultValue = "1") int page
+    ){
+        if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
+        return ApiResponse.ok(noticeService.findAll(page));
     }
 }

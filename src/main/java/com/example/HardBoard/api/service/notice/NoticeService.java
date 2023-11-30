@@ -7,9 +7,12 @@ import com.example.HardBoard.domain.notice.Notice;
 import com.example.HardBoard.domain.notice.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,5 +46,13 @@ public class NoticeService {
         return NoticeResponse.of(noticeRepository.findById(noticeId)
                 .orElseThrow(() ->
                 new IllegalArgumentException("Invalid id")));
+    }
+
+    public List<NoticeResponse> findAll(int page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 20,
+                Sort.by(Sort.Direction.DESC, "createdDateTime"));
+        return noticeRepository.findAll(pageRequest)
+                .map(NoticeResponse::of)
+                .getContent();
     }
 }

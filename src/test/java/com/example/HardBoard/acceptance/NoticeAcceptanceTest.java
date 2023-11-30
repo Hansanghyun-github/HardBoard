@@ -1,20 +1,15 @@
 package com.example.HardBoard.acceptance;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.notice.request.NoticeCreateRequest;
 import com.example.HardBoard.api.controller.notice.request.NoticeEditRequest;
+import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.api.service.notice.response.NoticeResponse;
-import com.example.HardBoard.api.service.user.response.UserResponse;
 import com.example.HardBoard.config.SecurityConfig;
-import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.notice.Notice;
 import com.example.HardBoard.domain.notice.NoticeRepository;
-import com.example.HardBoard.domain.user.User;
-import com.example.HardBoard.domain.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +17,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -68,8 +62,8 @@ public class NoticeAcceptanceTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ApiResponse apiResponse = objectMapper.readValue(content, ApiResponse.class);
-        NoticeResponse noticeResponse = objectMapper.readValue(objectMapper
-                        .writeValueAsString(apiResponse.getData()), NoticeResponse.class);
+        com.example.HardBoard.api.service.notice.response.NoticeResponse noticeResponse = objectMapper.readValue(objectMapper
+                        .writeValueAsString(apiResponse.getData()), com.example.HardBoard.api.service.notice.response.NoticeResponse.class);
 
         // then
         assertThat(noticeRepository.findById(noticeResponse.getId())
@@ -140,5 +134,41 @@ public class NoticeAcceptanceTest {
         // then
         assertThatThrownBy(() -> noticeRepository.findById(noticeId).orElseThrow())
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("공지를 조회한다")
+    void getNoticeList() throws Exception {
+        // given
+        for(int i=0;i<35;i++){
+            noticeRepository.save(
+                    Notice.builder()
+                            .title("title" + i)
+                            .contents("contents" + i)
+                            .build()
+            );
+        }
+
+        // when
+        String content = mockMvc.perform(get("/public/notices?page=1"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<NoticeResponse> collect = (List<NoticeResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), NoticeResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+
+
+        // then
+        assertThat(collect.size()).isEqualTo(20);
+        for(int i=0;i<collect.size()-1;i++){
+            assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isNotNegative();
+        }
     }
 }

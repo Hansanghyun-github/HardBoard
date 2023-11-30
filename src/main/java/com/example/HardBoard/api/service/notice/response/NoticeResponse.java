@@ -5,18 +5,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 public class NoticeResponse {
     private Long id;
     private String title;
     private String contents;
+    private LocalDateTime createdDateTime;
 
     @Builder
-    private NoticeResponse(Long id, String title, String contents) {
+    public NoticeResponse(Long id, String title, String contents, LocalDateTime createdDateTime) {
         this.id = id;
         this.title = title;
         this.contents = contents;
+        this.createdDateTime = createdDateTime;
     }
 
     public static NoticeResponse of(Notice notice){
@@ -24,6 +28,7 @@ public class NoticeResponse {
                 .id(notice.getId())
                 .title(notice.getTitle())
                 .contents(notice.getContents())
+                .createdDateTime(notice.getCreatedDateTime())
                 .build();
     }
 }

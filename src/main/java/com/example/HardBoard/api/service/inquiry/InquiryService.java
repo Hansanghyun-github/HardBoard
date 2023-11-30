@@ -1,6 +1,5 @@
 package com.example.HardBoard.api.service.inquiry;
 
-import com.example.HardBoard.api.service.block.response.BlockResponse;
 import com.example.HardBoard.api.service.inquiry.request.InquiryEditServiceRequest;
 import com.example.HardBoard.api.service.inquiry.request.InquiryRegisterServiceRequest;
 import com.example.HardBoard.api.service.inquiry.request.InquiryRespondServiceRequest;

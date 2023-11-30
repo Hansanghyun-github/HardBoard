@@ -7,7 +7,6 @@ import com.example.HardBoard.api.controller.inquiry.request.InquiryRespondReques
 import com.example.HardBoard.api.service.inquiry.InquiryService;
 import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
-import com.example.HardBoard.domain.inquiry.Inquiry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
