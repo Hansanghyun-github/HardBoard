@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthValidationService {
-    private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void verifyPathUserId(Long userId){
