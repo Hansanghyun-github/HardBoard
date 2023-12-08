@@ -3,7 +3,6 @@ package com.example.HardBoard.acceptance.publicApi;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.HardBoard.api.ApiResponse;
-import com.example.HardBoard.api.service.block.response.BlockResponse;
 import com.example.HardBoard.api.service.comment.response.CommentResponse;
 import com.example.HardBoard.api.service.post.response.PostCommentResponse;
 import com.example.HardBoard.api.service.post.response.PostResponse;
@@ -27,10 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -611,59 +614,599 @@ public class PublicPostAcceptanceTest {
     @DisplayName("오늘의 베스트 글을 조회한다")
     void getDayBestRecommendedPostList() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightYesterday = midnightToday.minusDays(1L);
+        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<20;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        Post postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("prevTitle")
+                        .contents("prevContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(beforeMidnightYesterday);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("todayTitle")
+                        .contents("todayContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(midnightToday);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        for(int i=0;i<21;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(user)
+                            .build()
+            );
+
+            if(i < 11) post.changeCreatedDateTimeforTest(midnightYesterday);
+            else post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(23);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(20);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightYesterday, beforeMidnightToday));
     }
 
     @Test
     @DisplayName("오늘의 베스트 글을 조회할 때, 로그인을 했다면, 차단한 유저의 글은 제외한다")
     void getDayBestRecommendedPostListWithoutPostOfBlockUserIfLogin() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightYesterday = midnightToday.minusDays(1L);
+        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<10;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        for(int i=0;i<10;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(recommendUsers.get(i))
+                            .build()
+            );
+
+            post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+
+            if(i < 5){
+                blockRepository.save(
+                        Block.builder()
+                                .comments("comments")
+                                .user(user)
+                                .blockUser(recommendUsers.get(i))
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(5);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightYesterday, beforeMidnightToday));
+
+        assertThat(bestPostList.stream().map(PostResponse::getUserId).collect(Collectors.toList()))
+                .isNotIn(blockRepository.findByUserId(userId).toArray());
     }
 
     @Test
     @DisplayName("주간 베스트 글을 조회한다")
     void getWeekBestRecommendedPostList() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightWeekAgo = midnightToday.minusWeeks(1L);
+        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<20;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        Post postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("prevTitle")
+                        .contents("prevContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(beforeMidnightWeekAgo);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("todayTitle")
+                        .contents("todayContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(midnightToday);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        for(int i=0;i<21;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(user)
+                            .build()
+            );
+
+            if(i < 11) post.changeCreatedDateTimeforTest(midnightWeekAgo);
+            else post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(23);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(20);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightWeekAgo, beforeMidnightToday));
     }
 
     @Test
     @DisplayName("주간 베스트 글을 조회할 때, 로그인을 했다면, 차단한 유저의 글은 제외한다")
     void getWeekBestRecommendedPostListWithoutPostOfBlockUserIfLogin() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightWeekAgo = midnightToday.minusWeeks(1L);
+        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<10;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        for(int i=0;i<10;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(recommendUsers.get(i))
+                            .build()
+            );
+
+            post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+
+            if(i < 5){
+                blockRepository.save(
+                        Block.builder()
+                                .comments("comments")
+                                .user(user)
+                                .blockUser(recommendUsers.get(i))
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(5);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightWeekAgo, beforeMidnightToday));
+
+        assertThat(bestPostList.stream().map(PostResponse::getUserId).collect(Collectors.toList()))
+                .isNotIn(blockRepository.findByUserId(userId).toArray());
     }
 
     @Test
     @DisplayName("월간 베스트 글을 조회한다")
     void getMonthBestRecommendedPostList() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightMonthAgo = midnightToday.minusMonths(1L);
+        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<20;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        Post postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("prevTitle")
+                        .contents("prevContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(beforeMidnightMonthAgo);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        postNotIncluded = postRepository.save(
+                Post.builder()
+                        .title("todayTitle")
+                        .contents("todayContents")
+                        .category(Category.Chat)
+                        .user(user)
+                        .build()
+        );
+        postNotIncluded.changeCreatedDateTimeforTest(midnightToday);
+
+        for(int j=0;j<20;j++){
+            postRecommendRepository.save(
+                    PostRecommend.builder()
+                            .post(postNotIncluded)
+                            .user(recommendUsers.get(j))
+                            .build()
+            );
+        }
+
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+
+        for(int i=0;i<21;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(user)
+                            .build()
+            );
+
+            if(i < 11) post.changeCreatedDateTimeforTest(midnightMonthAgo);
+            else post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(23);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(20);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightMonthAgo, beforeMidnightToday));
     }
 
     @Test
     @DisplayName("월간 베스트 글을 조회할 때, 로그인을 했다면, 차단한 유저의 글은 제외한다")
     void getMonthBestRecommendedPostListWithoutPostOfBlockUserIfLogin() throws Exception {
         // given
+        LocalDateTime midnightToday = LocalDateTime.of(
+                LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime midnightMonthAgo = midnightToday.minusMonths(1L);
+        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusNanos(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+
+        List<User> recommendUsers = new ArrayList<>();
+        for(int i=0;i<10;i++){
+            recommendUsers.add(userRepository.save(
+                    User.builder()
+                            .email("email@email" + i)
+                            .password(passwordEncoder.encode("password"))
+                            .nickname("nickname" + i)
+                            .role(Role.ROLE_USER)
+                            .build()
+            ));
+        }
+
+        for(int i=0;i<10;i++){
+            Post post = postRepository.save(
+                    Post.builder()
+                            .title("yesterdayTitle" + i)
+                            .contents("yesterdayContents" + i)
+                            .category(Category.Chat)
+                            .user(recommendUsers.get(i))
+                            .build()
+            );
+
+            post.changeCreatedDateTimeforTest(beforeMidnightToday);
+
+            for(int j=0;j<i-1;j++){
+                postRecommendRepository.save(
+                        PostRecommend.builder()
+                                .user(recommendUsers.get(j))
+                                .post(post)
+                                .build()
+                );
+            }
+
+            if(i < 5){
+                blockRepository.save(
+                        Block.builder()
+                                .comments("comments")
+                                .user(user)
+                                .blockUser(recommendUsers.get(i))
+                                .build()
+                );
+            }
+        }
+
+        assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
+        String content = mockMvc.perform(get("/public/posts/day"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
+        List<PostResponse> bestPostList = (List<PostResponse>) list.stream().map(d ->
+                {
+                    try {
+                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
 
         // then
+        assertThat(bestPostList.size()).isEqualTo(5);
+        for(int i=0;i<bestPostList.size()-1;i++){
+            assertThat(bestPostList.get(i).getRecommends()
+                    .compareTo(bestPostList.get(i+1).getRecommends()))
+                    .isNotNegative();
+        }
+        bestPostList.stream().map(PostResponse::getCreatedDateTime)
+                .forEach(t -> assertThat(t).isBetween(midnightMonthAgo, beforeMidnightToday));
+
+        assertThat(bestPostList.stream().map(PostResponse::getUserId).collect(Collectors.toList()))
+                .isNotIn(blockRepository.findByUserId(userId).toArray());
     }
 }
