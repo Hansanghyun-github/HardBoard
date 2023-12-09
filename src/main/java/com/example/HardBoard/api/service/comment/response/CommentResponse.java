@@ -15,36 +15,34 @@ public class CommentResponse {
     private Long parentCommentId;
     private Long postId;
     private Long userId;
+    private String nickname;
     private Long recommends;
     private Long unrecommends;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    // TODO add user nickname
+    private LocalDateTime createdDateTime;
 
     @Builder
-    public CommentResponse(Long id, String contents, Long parentCommentId, Long postId, Long userId, Long recommends, Long unrecommends, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CommentResponse(Long id, String contents, Long parentCommentId, Long postId, Long userId, String nickname, Long recommends, Long unrecommends, LocalDateTime createdDateTime) {
         this.id = id;
         this.contents = contents;
         this.parentCommentId = parentCommentId;
         this.postId = postId;
         this.userId = userId;
+        this.nickname = nickname;
         this.recommends = recommends;
         this.unrecommends = unrecommends;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdDateTime = createdDateTime;
     }
-
 
     public static CommentResponse of(Comment comment, long recommends, long unrecommends) {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .contents(comment.getContents())
                 .parentCommentId(comment.getParent().getId())
-                .createdAt(comment.getCreatedDateTime())
-                .updatedAt(comment.getModifiedDateTime())
+                .createdDateTime(comment.getCreatedDateTime())
                 .postId(comment.getPost().getId())
                 .userId(comment.getUser().getId())
+                .nickname(comment.getUser().getNickname())
                 .recommends(recommends)
                 .unrecommends(unrecommends)
                 .build();

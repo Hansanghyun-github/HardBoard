@@ -30,6 +30,11 @@ public class PostService {
         return PostResponse.of(post, 0L, 0L);
     } // TODO 자기 자신 post에 추천 막는 기능 추가
 
+    public void validatePost(Long postId) {
+        if(postRepository.existsById(postId) == false)
+            throw new IllegalArgumentException("Invalid postId");
+    }
+
     public void validatePost(Long postId, User user) {
         if(postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid postId"))

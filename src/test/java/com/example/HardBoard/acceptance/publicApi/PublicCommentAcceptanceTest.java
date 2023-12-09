@@ -111,13 +111,14 @@ public class PublicCommentAcceptanceTest {
                             .role(Role.ROLE_USER)
                             .build()
             );
-            commentRepository.save(
+            Comment comment = commentRepository.save(
                     Comment.builder()
                             .contents("contents" + i)
                             .post(post)
                             .user(saved)
                             .build()
             );
+            comment.setParent(comment);
         }
 
         // when
@@ -168,13 +169,14 @@ public class PublicCommentAcceptanceTest {
                             .role(Role.ROLE_USER)
                             .build()
             );
-            commentRepository.save(
+            Comment comment = commentRepository.save(
                     Comment.builder()
                             .contents("contents" + i)
                             .post(post)
                             .user(saved)
                             .build()
             );
+            comment.setParent(comment);
 
             if(i < 5){
                 blockRepository.save(
@@ -217,7 +219,7 @@ public class PublicCommentAcceptanceTest {
     void getCommentListWithWrongPostId() throws Exception {
         // when // then
         mockMvc.perform(get("/public/comments/post/" + 0L))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid postId"));
     }
 
@@ -226,7 +228,7 @@ public class PublicCommentAcceptanceTest {
     void getCommentListWithPostIdAndWrongPage() throws Exception {
         // when // then
         mockMvc.perform(get("/public/comments/post/" + 0L + "?page=0"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("page has to be greater than zero"));
     }
 
@@ -243,21 +245,23 @@ public class PublicCommentAcceptanceTest {
                         .build()
         );
 
+        Post post = postRepository.save(
+                Post.builder()
+                        .title("title")
+                        .contents("contents")
+                        .user(user)
+                        .build()
+        );
+
         for(int i=0;i<30;i++){
-            Post post = postRepository.save(
-                    Post.builder()
-                            .title("title" + i)
-                            .contents("contents" + i)
-                            .user(user)
-                            .build()
-            );
-            commentRepository.save(
+            Comment comment = commentRepository.save(
                     Comment.builder()
                             .contents("contents" + i)
                             .post(post)
                             .user(anotherUser)
                             .build()
             );
+            comment.setParent(comment);
         }
 
         // when
@@ -291,7 +295,7 @@ public class PublicCommentAcceptanceTest {
     void getCommentListOfWrongUserId() throws Exception {
         // when // then
         mockMvc.perform(get("/public/comments/" + 0L))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid userId"));
     }
 
@@ -300,7 +304,7 @@ public class PublicCommentAcceptanceTest {
     void getCommentListOfUserIdAndWrongPage() throws Exception {
         // when // then
         mockMvc.perform(get("/public/comments/" + 0L + "?page=0"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("page has to be greater than zero"));
     }
 }

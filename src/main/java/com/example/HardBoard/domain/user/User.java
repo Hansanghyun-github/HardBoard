@@ -2,11 +2,13 @@ package com.example.HardBoard.domain.user;
 
 import com.example.HardBoard.api.service.user.request.UserCreateServiceRequest;
 import com.example.HardBoard.domain.BaseEntity;
+import com.example.HardBoard.domain.block.Block;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,7 +16,7 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
+@ToString(exclude = {"blockList"})
 public class User extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

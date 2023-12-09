@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-class JwtAuthenticationFilterTest { // TODO 성공 케이스 테스트 추가
+class JwtAuthenticationFilterTest {
     @Mock
     UserRepository userRepository;
     @InjectMocks

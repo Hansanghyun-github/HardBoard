@@ -57,5 +57,8 @@ public class UserService {
                 .changePassword(passwordEncoder, request.getNewPassword());
     }
 
-
+    public void validateUser(Long userId){
+        if(userRepository.existsById(userId) == false)
+            throw new IllegalArgumentException("Invalid userId");
+    }
 }

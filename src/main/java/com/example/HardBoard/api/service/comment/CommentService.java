@@ -11,8 +11,12 @@ import com.example.HardBoard.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class CommentService {
@@ -62,6 +66,6 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid commentId"))
                 .delete();
         // 댓글은 계층형 구조라, 부모 댓글이 사라지면 안되서 직접 delete하지 않았다.
-        // TODO delete 세팅은 해줬는데, 이렇게 되면 더미 데이터가 계속 쌓일 것이다 -> 어떻게 처리해야 하나
+        // TODO 루트댓글이라면 삭제(하위 댓글 없을 때 -> 동시성 문제), 아니라면 보이지 않게 세팅
     }
 }
