@@ -2,6 +2,7 @@ package com.example.HardBoard.api.service.block;
 
 import com.example.HardBoard.api.service.block.request.BlockServiceRequest;
 import com.example.HardBoard.api.service.block.response.BlockResponse;
+import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.block.Block;
 import com.example.HardBoard.domain.block.BlockRepository;
 import com.example.HardBoard.domain.user.User;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -51,5 +54,16 @@ public class BlockService {
         return blockRepository.findByUserId(userId, pageRequest)
                 .map(BlockResponse::of)
                 .getContent();
+    }
+
+    public List<Long> getBlockList(PrincipalDetails principal) {
+        if(principal != null){
+            return blockRepository.findByUserId(principal.getUser().getId()).stream()
+                    .map(Block::getBlockUser)
+                    .map(User::getId)
+                    .collect(Collectors.toList()); // TODO User fetch join으로 꺼내기
+        }
+        else
+            return Collections.emptyList();
     }
 }

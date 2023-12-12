@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.service.comment;
 
+import com.example.HardBoard.api.service.block.BlockService;
 import com.example.HardBoard.api.service.comment.response.CommentResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.block.Block;
@@ -25,13 +26,13 @@ public class PublicCommentService {
     private static final int PAGE_SIZE = 20;
 
     private final CommentRepository commentRepository;
-    private final BlockRepository blockRepository;
+    private final BlockService blockService;
 
     private final CommentRecommendService commentRecommendService;
     private final CommentUnrecommendService commentUnrecommendService;
 
     public List<CommentResponse> getCommentListOfPost(Long postId, PrincipalDetails principal, int page) {
-        List<Long> blockUserIdList = getBlockList(principal);
+        List<Long> blockUserIdList = blockService.getBlockList(principal);
 
         PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
         return commentRepository.findByPostId(postId, blockUserIdList, pageRequest)
@@ -53,16 +54,5 @@ public class PublicCommentService {
 
     public int countLastPageOfPost(Long postId) { // TODO Boundary Unit Test
         return commentRepository.countByPostId(postId).intValue() / PAGE_SIZE;
-    }
-
-    private List<Long> getBlockList(PrincipalDetails principal) { // TODO UserService로?
-        if(principal != null){
-            return blockRepository.findByUserId(principal.getUser().getId()).stream()
-                    .map(Block::getBlockUser)
-                    .map(User::getId)
-                    .collect(Collectors.toList()); // TODO User fetch join으로 꺼내기
-        }
-        else
-            return Collections.emptyList();
     }
 }
