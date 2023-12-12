@@ -56,7 +56,7 @@ public class BlockService {
                 .getContent();
     }
 
-    public List<Long> getBlockList(PrincipalDetails principal) {
+    public List<Long> getBlockUserIdList(PrincipalDetails principal) {
         if(principal != null){
             return blockRepository.findByUserId(principal.getUser().getId()).stream()
                     .map(Block::getBlockUser)

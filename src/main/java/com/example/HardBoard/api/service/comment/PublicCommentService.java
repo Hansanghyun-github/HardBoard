@@ -3,10 +3,7 @@ package com.example.HardBoard.api.service.comment;
 import com.example.HardBoard.api.service.block.BlockService;
 import com.example.HardBoard.api.service.comment.response.CommentResponse;
 import com.example.HardBoard.config.auth.PrincipalDetails;
-import com.example.HardBoard.domain.block.Block;
-import com.example.HardBoard.domain.block.BlockRepository;
 import com.example.HardBoard.domain.comment.CommentRepository;
-import com.example.HardBoard.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -14,9 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,7 +27,7 @@ public class PublicCommentService {
     private final CommentUnrecommendService commentUnrecommendService;
 
     public List<CommentResponse> getCommentListOfPost(Long postId, PrincipalDetails principal, int page) {
-        List<Long> blockUserIdList = blockService.getBlockList(principal);
+        List<Long> blockUserIdList = blockService.getBlockUserIdList(principal);
 
         PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
         return commentRepository.findByPostId(postId, blockUserIdList, pageRequest)
