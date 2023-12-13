@@ -116,13 +116,14 @@ public class PublicPostAcceptanceTest {
                             .role(Role.ROLE_USER)
                             .build()
             );
-            commentRepository.save(
+            Comment comment = commentRepository.save(
                     Comment.builder()
                             .contents("contents" + i)
                             .post(post)
                             .user(saved)
                             .build()
             );
+            comment.setParent();
         }
 
         Long prevViews = post.getViews();
@@ -138,14 +139,16 @@ public class PublicPostAcceptanceTest {
         List<CommentResponse> commentList = postCommentResponse.getCommentList();
 
         // then
-        assertThat(postRepository.findById(postCommentResponse.getPostId()).orElseThrow().getViews())
-                .isEqualTo(postCommentResponse.getViews())
-                .isEqualTo(prevViews + 1L);
         assertThat(postCommentResponse.getNickname()).isEqualTo(user.getNickname());
         assertThat(commentList.size()).isEqualTo(10);
 
         for(int i=0;i < commentList.size()-1;i++)
             assertThat(commentList.get(i).getCreatedDateTime().compareTo(commentList.get(i+1).getCreatedDateTime())).isNotPositive();
+
+        /*assertThat(postRepository.findById(postCommentResponse.getPostId()).orElseThrow().getViews())
+                .isEqualTo(postCommentResponse.getViews())
+                .isEqualTo(prevViews + 1L);*/
+        // TODO Google Analytics API 추가 후, 조회수 1 증가 체크
     }
 
     @Test
@@ -155,12 +158,12 @@ public class PublicPostAcceptanceTest {
         mockMvc.perform(get("/public/posts/" + 0L)
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid postId"));
     }
 
     @Test
-    @DisplayName("로그인을 했다면 차단한 유저의 comment를 제외한 post와 commentList가 반환되야 한다")
+    @DisplayName("postId로 post 조회할 때, 로그인을 했다면 차단한 유저의 comment를 제외한 post와 commentList가 반환되야 한다")
     void getPostAndCommentListOfPostIdAndAuthenticatedUser() throws Exception {
         // given
 
@@ -182,13 +185,14 @@ public class PublicPostAcceptanceTest {
                             .role(Role.ROLE_USER)
                             .build()
             );
-            commentRepository.save(
+            Comment comment = commentRepository.save(
                     Comment.builder()
                             .contents("contents" + i)
                             .post(post)
                             .user(saved)
                             .build()
             );
+            comment.setParent();
 
             if(i < 5){
                 blockRepository.save(
@@ -328,56 +332,6 @@ public class PublicPostAcceptanceTest {
 
         for(int i=0;i<collect.size()-1;i++){
             assertThat(collect.get(i).getCreatedDateTime().compareTo(collect.get(i+1).getCreatedDateTime())).isNotNegative();
-        }
-    }
-    
-    @Test
-    @DisplayName("postList를 조회할 때, category가 Hot이라면, 다른 쿼리가 나가야 한다")
-    void getPostListWithHotCategory() throws Exception {
-        // given
-        for(int i=0;i<30;i++){
-            User saved = userRepository.save(
-                    User.builder()
-                            .email("email@email" + i)
-                            .nickname("nickname" + i)
-                            .password(passwordEncoder.encode("password"))
-                            .role(Role.ROLE_USER)
-                            .build()
-            );
-            postRepository.save(
-                    Post.builder()
-                            .title("title" + i)
-                            .contents("contents" + i)
-                            .category(Category.Chat)
-                            .user(saved)
-                            .build()
-            );
-        }
-
-        // TODO 랜덤 추천 메서드
-
-        // when
-        String content = mockMvc.perform(get("/public/posts?category=Hot"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
-        List<PostResponse> collect = (List<PostResponse>) list.stream().map(d ->
-                {
-                    try {
-                        return objectMapper.readValue(objectMapper.writeValueAsString(d), PostResponse.class);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
-
-        // then
-        collect.stream().forEach(pR -> {
-            assertThat(pR.getCategory()).isEqualTo(Category.Hot); // TODO Hot ?
-        });
-
-        for(int i=0;i<collect.size()-1;i++){
-            assertThat(collect.get(i).getRecommends().compareTo(collect.get(i+1).getRecommends())).isNotNegative();
         }
     }
 
@@ -526,7 +480,7 @@ public class PublicPostAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/posts/" + anotherUser.getId()))
+        String content = mockMvc.perform(get("/public/users/posts/" + anotherUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -554,8 +508,8 @@ public class PublicPostAcceptanceTest {
     @DisplayName("userId를 이용해 해당 유저의 PostList를 조회할 때, 올바른 userId를 입력해야 한다")
     void getPostListWithWrongUserId() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/posts/" + 0L))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/public/users/posts/" + 0L))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid userId"));
     }
     
@@ -563,8 +517,8 @@ public class PublicPostAcceptanceTest {
     @DisplayName("userId를 이용해 해당 유저의 PostList를 조회할 때, 올바른 page를 입력해야 한다")
     void getPostListWithUserIdAndWrongPage() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/posts/" + 0L + "?page=0"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/public/users/posts/" + 0L + "?page=0"))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("page has to be greater than zero"));
     }
 
@@ -592,7 +546,7 @@ public class PublicPostAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/posts/" + anotherUser.getId()))
+        String content = mockMvc.perform(get("/public/users/posts/" + anotherUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();

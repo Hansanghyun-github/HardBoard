@@ -1,22 +1,28 @@
 package com.example.HardBoard.domain.user;
 
-import org.assertj.core.api.Assertions;
+import com.example.HardBoard.domain.block.Block;
+import com.example.HardBoard.domain.block.BlockRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class UserRepositoryTest {
     @Autowired UserRepository userRepository;
+    @Autowired
+    BlockRepository blockRepository;
+
     @Test
     @DisplayName("이메일을 통해 유저를 찾는다")
     void findByEmail() throws Exception {

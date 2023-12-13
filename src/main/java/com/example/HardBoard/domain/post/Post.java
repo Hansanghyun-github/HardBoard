@@ -5,11 +5,11 @@ import com.example.HardBoard.domain.user.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "posts")
-@ToString(exclude = {"user"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
     @Id @GeneratedValue
@@ -54,6 +54,9 @@ public class Post extends BaseEntity {
         this.category = Category.Chat;
     }
 
+    // TODO 빌더 2개나 만드는게 맞을지
+
+
     public static Post create(String title,
                               String contents,
                               Category category,
@@ -69,5 +72,22 @@ public class Post extends BaseEntity {
     public void edit(String title, String contents) {
         this.title=title;
         this.contents=contents;
+    }
+
+    public void changeCreatedDateTimeforTest(LocalDateTime createdDateTime){
+        this.createdDateTime = createdDateTime;
+    } // TODO TODO test 때문에 set 메서드 만듬, 나중에는 없애야 함
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", contents='" + contents + '\'' +
+                ", category=" + category +
+                ", views=" + views +
+                ", createdDateTime=" + createdDateTime +
+                ", modifiedDateTime=" + modifiedDateTime +
+                '}';
     }
 }

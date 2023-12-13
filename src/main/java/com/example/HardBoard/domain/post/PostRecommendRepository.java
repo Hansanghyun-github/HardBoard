@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PostRecommendRepository extends JpaRepository<PostRecommend, Long> {
+public interface PostRecommendRepository extends JpaRepository<PostRecommend, Long> { // TODO post domain과 분리 필요
     public boolean existsByUserIdAndPostId(Long userId, Long postId);
     public void deleteByUserIdAndPostId(Long userId, Long postId);
 

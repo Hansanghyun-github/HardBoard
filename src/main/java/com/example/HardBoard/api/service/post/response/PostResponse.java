@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostResponse {
+public class PostResponse { // PostList에서 필요한 정보들
     private Long postId;
     private String title;
     private String contents;
@@ -20,16 +20,18 @@ public class PostResponse {
     private Long views;
     private Category category;
     private Long userId;
-    // TODO add user nickname
+    private String nickname;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDateTime;
+    private LocalDateTime modifiedDateTime;
+
+    // TODO add countComment
 
     @Builder
     public PostResponse(
             Long postId, String title, String contents,
             Long recommends, Long unrecommends, Long views,
-            Category category, Long userId,
+            Category category, Long userId, String nickname,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.postId = postId;
         this.title = title;
@@ -39,8 +41,9 @@ public class PostResponse {
         this.views = views;
         this.category = category;
         this.userId = userId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.nickname = nickname;
+        this.createdDateTime = createdAt;
+        this.modifiedDateTime = updatedAt;
     }
 
     public static PostResponse of(Post post, Long recommends, Long unrecommends){
@@ -54,6 +57,8 @@ public class PostResponse {
                 .views(post.getViews())
                 .createdAt(post.getCreatedDateTime())
                 .updatedAt(post.getModifiedDateTime())
+                .userId(post.getUser().getId())
+                .nickname(post.getUser().getNickname())
                 .build();
     }
 }
