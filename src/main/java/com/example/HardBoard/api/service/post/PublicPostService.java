@@ -6,7 +6,7 @@ import com.example.HardBoard.api.service.user.UserService;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.post.Category;
 import com.example.HardBoard.domain.post.PostRepository;
-import com.example.HardBoard.domain.post.PublicPostRepository;
+import com.example.HardBoard.domain.post.querydsl.PublicPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -57,5 +57,41 @@ public class PublicPostService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid postId")),
                 postRecommendService.countPostRecommends(postId),
                 postUnrecommendService.countPostUnrecommends(postId));
+    }
+
+    public List<PostResponse> getDayBestRecommendPostList(PrincipalDetails principal) {
+        List<Long> blockList = blockService.getBlockUserIdList(principal);
+        return publicPostRepository.findDayBestRecommendPostList(blockList)
+                .stream().map(post ->
+                        PostResponse.of(
+                                post,
+                                postRecommendService.countPostRecommends(post.getId()),
+                                postUnrecommendService.countPostUnrecommends(post.getId())
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getWeekBestRecommendPostList(PrincipalDetails principal) {
+        List<Long> blockList = blockService.getBlockUserIdList(principal);
+        return publicPostRepository.findWeekBestRecommendPostList(blockList)
+                .stream().map(post ->
+                        PostResponse.of(
+                                post,
+                                postRecommendService.countPostRecommends(post.getId()),
+                                postUnrecommendService.countPostUnrecommends(post.getId())
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getMonthBestRecommendPostList(PrincipalDetails principal) {
+        List<Long> blockList = blockService.getBlockUserIdList(principal);
+        return publicPostRepository.findMonthBestRecommendPostList(blockList)
+                .stream().map(post ->
+                        PostResponse.of(
+                                post,
+                                postRecommendService.countPostRecommends(post.getId()),
+                                postUnrecommendService.countPostUnrecommends(post.getId())
+                        ))
+                .collect(Collectors.toList());
     }
 }

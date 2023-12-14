@@ -571,8 +571,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightYesterday = midnightToday.minusDays(1L);
-        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<20;i++){
@@ -586,7 +586,7 @@ public class PublicPostAcceptanceTest {
             ));
         }
 
-        Post postNotIncluded = postRepository.save(
+        Post postNotIncluded1 = postRepository.save(
                 Post.builder()
                         .title("prevTitle")
                         .contents("prevContents")
@@ -594,20 +594,20 @@ public class PublicPostAcceptanceTest {
                         .user(user)
                         .build()
         );
-        postNotIncluded.changeCreatedDateTimeforTest(beforeMidnightYesterday);
+        postNotIncluded1.changeCreatedDateTimeforTest(beforeMidnightYesterday);
 
         for(int j=0;j<20;j++){
             postRecommendRepository.save(
                     PostRecommend.builder()
-                            .post(postNotIncluded)
+                            .post(postNotIncluded1)
                             .user(recommendUsers.get(j))
                             .build()
             );
         }
 
-        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded1.getId())).isEqualTo(20L);
 
-        postNotIncluded = postRepository.save(
+        Post postNotIncluded2 = postRepository.save(
                 Post.builder()
                         .title("todayTitle")
                         .contents("todayContents")
@@ -615,18 +615,18 @@ public class PublicPostAcceptanceTest {
                         .user(user)
                         .build()
         );
-        postNotIncluded.changeCreatedDateTimeforTest(midnightToday);
+        postNotIncluded2.changeCreatedDateTimeforTest(midnightToday);
 
         for(int j=0;j<20;j++){
             postRecommendRepository.save(
                     PostRecommend.builder()
-                            .post(postNotIncluded)
+                            .post(postNotIncluded2)
                             .user(recommendUsers.get(j))
                             .build()
             );
         }
 
-        assertThat(postRecommendRepository.countByPostId(postNotIncluded.getId())).isEqualTo(20L);
+        assertThat(postRecommendRepository.countByPostId(postNotIncluded2.getId())).isEqualTo(20L);
 
         for(int i=0;i<21;i++){
             Post post = postRepository.save(
@@ -641,7 +641,7 @@ public class PublicPostAcceptanceTest {
             if(i < 11) post.changeCreatedDateTimeforTest(midnightYesterday);
             else post.changeCreatedDateTimeforTest(beforeMidnightToday);
 
-            for(int j=0;j<i-1;j++){
+            for(int j=0;j<i;j++){
                 postRecommendRepository.save(
                         PostRecommend.builder()
                                 .user(recommendUsers.get(j))
@@ -677,6 +677,8 @@ public class PublicPostAcceptanceTest {
         }
         bestPostList.stream().map(PostResponse::getCreatedDateTime)
                 .forEach(t -> assertThat(t).isBetween(midnightYesterday, beforeMidnightToday));
+
+        bestPostList.forEach(p -> System.out.println(p));
     }
 
     @Test
@@ -686,8 +688,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightYesterday = midnightToday.minusDays(1L);
-        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightYesterday = midnightYesterday.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<10;i++){
@@ -736,7 +738,9 @@ public class PublicPostAcceptanceTest {
         assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
-        String content = mockMvc.perform(get("/public/posts/day"))
+        String content = mockMvc.perform(get("/public/posts/day")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -771,8 +775,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightWeekAgo = midnightToday.minusWeeks(1L);
-        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<20;i++){
@@ -841,7 +845,7 @@ public class PublicPostAcceptanceTest {
             if(i < 11) post.changeCreatedDateTimeforTest(midnightWeekAgo);
             else post.changeCreatedDateTimeforTest(beforeMidnightToday);
 
-            for(int j=0;j<i-1;j++){
+            for(int j=0;j<i;j++){
                 postRecommendRepository.save(
                         PostRecommend.builder()
                                 .user(recommendUsers.get(j))
@@ -854,7 +858,7 @@ public class PublicPostAcceptanceTest {
         assertThat(postRepository.findAll().size()).isEqualTo(23);
 
         // when
-        String content = mockMvc.perform(get("/public/posts/day"))
+        String content = mockMvc.perform(get("/public/posts/week"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -886,8 +890,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightWeekAgo = midnightToday.minusWeeks(1L);
-        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightWeekAgo = midnightWeekAgo.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<10;i++){
@@ -936,7 +940,9 @@ public class PublicPostAcceptanceTest {
         assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
-        String content = mockMvc.perform(get("/public/posts/day"))
+        String content = mockMvc.perform(get("/public/posts/week")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -971,8 +977,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightMonthAgo = midnightToday.minusMonths(1L);
-        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<20;i++){
@@ -1041,7 +1047,7 @@ public class PublicPostAcceptanceTest {
             if(i < 11) post.changeCreatedDateTimeforTest(midnightMonthAgo);
             else post.changeCreatedDateTimeforTest(beforeMidnightToday);
 
-            for(int j=0;j<i-1;j++){
+            for(int j=0;j<i;j++){
                 postRecommendRepository.save(
                         PostRecommend.builder()
                                 .user(recommendUsers.get(j))
@@ -1054,7 +1060,7 @@ public class PublicPostAcceptanceTest {
         assertThat(postRepository.findAll().size()).isEqualTo(23);
 
         // when
-        String content = mockMvc.perform(get("/public/posts/day"))
+        String content = mockMvc.perform(get("/public/posts/month"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -1086,8 +1092,8 @@ public class PublicPostAcceptanceTest {
         LocalDateTime midnightToday = LocalDateTime.of(
                 LocalDate.now(), LocalTime.MIDNIGHT);
         LocalDateTime midnightMonthAgo = midnightToday.minusMonths(1L);
-        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusNanos(1L);
-        LocalDateTime beforeMidnightToday = midnightToday.minusNanos(1L);
+        LocalDateTime beforeMidnightMonthAgo = midnightMonthAgo.minusSeconds(1L);
+        LocalDateTime beforeMidnightToday = midnightToday.minusSeconds(1L);
 
         List<User> recommendUsers = new ArrayList<>();
         for(int i=0;i<10;i++){
@@ -1136,7 +1142,9 @@ public class PublicPostAcceptanceTest {
         assertThat(postRepository.findAll().size()).isEqualTo(10);
 
         // when
-        String content = mockMvc.perform(get("/public/posts/day"))
+        String content = mockMvc.perform(get("/public/posts/month")
+                        .header(JwtProperties.HEADER_STRING,
+                                JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();

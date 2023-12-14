@@ -59,7 +59,7 @@ public class PublicPostController {
     }
 
     @GetMapping("/public/posts/day")
-    public ApiResponse<PostResponse> getBestRecommendPostOfDay(
+    public ApiResponse<List<PostResponse>> getDayBestRecommendPostList(
             @AuthenticationPrincipal PrincipalDetails principal
     ){
         // TODO 유저와 글 만드는 것 따로 메서드로 구현(LocalDateTime 받아서 원하는 시간에 만들어지도록)
@@ -67,28 +67,28 @@ public class PublicPostController {
          * TODO 로그인 됐다면, 차단한 유저 안보여야 함,
          * TODO 로그인 안 했다면, 그냥 다 보여줘야 함
          */
-        return null;
+        return ApiResponse.ok(publicPostService.getDayBestRecommendPostList(principal));
     }
 
     @GetMapping("/public/posts/week")
-    public ApiResponse<PostResponse> getBestRecommendPostOfWeek(
+    public ApiResponse<List<PostResponse>> getWeekBestRecommendPostList(
             @AuthenticationPrincipal PrincipalDetails principal
     ){
         /*
          * TODO 로그인 됐다면, 차단한 유저 안보여야 함,
          * TODO 로그인 안 했다면, 그냥 다 보여줘야 함
          */
-        return null;
+        return ApiResponse.ok(publicPostService.getWeekBestRecommendPostList(principal));
     }
 
     @GetMapping("/public/posts/month")
-    public ApiResponse<PostResponse> getBestRecommendPostOfMonth(
+    public ApiResponse<List<PostResponse>> getMonthBestRecommendPostList(
             @AuthenticationPrincipal PrincipalDetails principal
     ){
         /*
          * TODO 로그인 됐다면, 차단한 유저 안보여야 함,
          * TODO 로그인 안 했다면, 그냥 다 보여줘야 함
          */
-        return null;
+        return ApiResponse.ok(publicPostService.getMonthBestRecommendPostList(principal));
     }
 }

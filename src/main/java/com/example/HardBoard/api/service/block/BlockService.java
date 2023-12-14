@@ -61,7 +61,7 @@ public class BlockService {
             return blockRepository.findByUserId(principal.getUser().getId()).stream()
                     .map(Block::getBlockUser)
                     .map(User::getId)
-                    .collect(Collectors.toList()); // TODO User fetch join으로 꺼내기
+                    .collect(Collectors.toList());
         }
         else
             return Collections.emptyList();

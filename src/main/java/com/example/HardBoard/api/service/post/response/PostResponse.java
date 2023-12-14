@@ -2,15 +2,13 @@ package com.example.HardBoard.api.service.post.response;
 
 import com.example.HardBoard.domain.post.Category;
 import com.example.HardBoard.domain.post.Post;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class PostResponse { // PostList에서 필요한 정보들
     private Long postId;
     private String title;
