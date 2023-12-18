@@ -189,8 +189,6 @@ public class PublicCommentAcceptanceTest {
             }
         }
 
-        Long prevViews = post.getViews();
-
         // when
         String content = mockMvc.perform(get("/public/comments/post/" + post.getId())
                         .header(JwtProperties.HEADER_STRING,

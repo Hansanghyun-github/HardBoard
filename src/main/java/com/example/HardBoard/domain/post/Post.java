@@ -29,10 +29,6 @@ public class Post extends BaseEntity {
 
     private Long unrecommends;*/
 
-    private Long views; // TODO if get, plus 1
-
-    // TODO 같은 get 요청을 계속 하면, 조회수가 끊임없이 올라간다. 어떻게 해결하나?
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -43,7 +39,6 @@ public class Post extends BaseEntity {
         this.contents = contents;
         this.category = category;
         this.user = user;
-        this.views = 0L;
     }
 
     @Builder
@@ -85,7 +80,6 @@ public class Post extends BaseEntity {
                 ", title='" + title + '\'' +
                 ", contents='" + contents + '\'' +
                 ", category=" + category +
-                ", views=" + views +
                 ", createdDateTime=" + createdDateTime +
                 ", modifiedDateTime=" + modifiedDateTime +
                 '}';

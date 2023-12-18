@@ -19,7 +19,6 @@ public class PostCommentResponse {
     private String contents;
     private Long recommends;
     private Long unrecommends;
-    private Long views;
     private Category category;
     private Long userId;
     private String nickname;
@@ -31,15 +30,14 @@ public class PostCommentResponse {
 
     @Builder
     public PostCommentResponse(Long postId, String title, String contents,
-                               Long recommends, Long unrecommends, Long views,
-                               Category category, Long userId, String nickname,
-                               LocalDateTime createdDateTime, LocalDateTime modifiedDateTime, List<CommentResponse> commentList) {
+                               Long recommends, Long unrecommends, Category category,
+                               Long userId, String nickname, LocalDateTime createdDateTime,
+                               LocalDateTime modifiedDateTime, List<CommentResponse> commentList) {
         this.postId = postId;
         this.title = title;
         this.contents = contents;
         this.recommends = recommends;
         this.unrecommends = unrecommends;
-        this.views = views;
         this.category = category;
         this.userId = userId;
         this.nickname = nickname;
@@ -56,7 +54,6 @@ public class PostCommentResponse {
                 .category(postResponse.getCategory())
                 .recommends(postResponse.getRecommends())
                 .unrecommends(postResponse.getUnrecommends())
-                .views(postResponse.getViews())
                 .createdDateTime(postResponse.getCreatedDateTime())
                 .modifiedDateTime(postResponse.getModifiedDateTime())
                 .userId(postResponse.getUserId())

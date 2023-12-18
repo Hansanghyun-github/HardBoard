@@ -15,7 +15,6 @@ public class PostResponse { // PostList에서 필요한 정보들
     private String contents;
     private Long recommends;
     private Long unrecommends;
-    private Long views;
     private Category category;
     private Long userId;
     private String nickname;
@@ -28,7 +27,7 @@ public class PostResponse { // PostList에서 필요한 정보들
     @Builder
     public PostResponse(
             Long postId, String title, String contents,
-            Long recommends, Long unrecommends, Long views,
+            Long recommends, Long unrecommends,
             Category category, Long userId, String nickname,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.postId = postId;
@@ -36,7 +35,6 @@ public class PostResponse { // PostList에서 필요한 정보들
         this.contents = contents;
         this.recommends = recommends;
         this.unrecommends = unrecommends;
-        this.views = views;
         this.category = category;
         this.userId = userId;
         this.nickname = nickname;
@@ -52,7 +50,6 @@ public class PostResponse { // PostList에서 필요한 정보들
                 .category(post.getCategory())
                 .recommends(recommends)
                 .unrecommends(unrecommends)
-                .views(post.getViews())
                 .createdAt(post.getCreatedDateTime())
                 .updatedAt(post.getModifiedDateTime())
                 .userId(post.getUser().getId())

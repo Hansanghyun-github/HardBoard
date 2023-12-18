@@ -126,8 +126,6 @@ public class PublicPostAcceptanceTest {
             comment.setParent();
         }
 
-        Long prevViews = post.getViews();
-
         // when
         String content = mockMvc.perform(get("/public/posts/" + post.getId()))
                 .andExpect(status().isOk())
@@ -144,11 +142,6 @@ public class PublicPostAcceptanceTest {
 
         for(int i=0;i < commentList.size()-1;i++)
             assertThat(commentList.get(i).getCreatedDateTime().compareTo(commentList.get(i+1).getCreatedDateTime())).isNotPositive();
-
-        /*assertThat(postRepository.findById(postCommentResponse.getPostId()).orElseThrow().getViews())
-                .isEqualTo(postCommentResponse.getViews())
-                .isEqualTo(prevViews + 1L);*/
-        // TODO Google Analytics API 추가 후, 조회수 1 증가 체크
     }
 
     @Test
@@ -205,8 +198,6 @@ public class PublicPostAcceptanceTest {
             }
         }
 
-        Long prevViews = post.getViews();
-
         // when
         String content = mockMvc.perform(get("/public/posts/" + post.getId())
                         .header(JwtProperties.HEADER_STRING,
@@ -224,21 +215,7 @@ public class PublicPostAcceptanceTest {
         List<Block> blockList = blockRepository.findByUserId(user.getId());
         assertThat(commentList).isNotIn(blockList.toArray());
     }
-    
-    @Test
-    @Disabled
-    @DisplayName("30분 내에 한번 더 글을 조회한다면 조회 수가 증가하지 않는다")
-    void getPostAndCommentTwice() throws Exception {
-        // given
-        // TODO 조회 수 방지 시간을 몇 분(초)로 설정할까?
-        
-        // when
-        
-        // then
-    }
-    
-    // TODO 한 명의 유저가 하루에 쓸 수 있는 Post, Comment, Recommend 제한
-    
+
     @Test
     @DisplayName("postList를 조회한다")
     void getPostList() throws Exception {
