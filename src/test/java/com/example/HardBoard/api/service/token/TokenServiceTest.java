@@ -113,7 +113,7 @@ class TokenServiceTest {
                 RefreshToken.builder()
                         .refreshToken(refreshTokenName)
                         .user(user)
-                        .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                        .expirationDateTime(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                         .build()).getRefreshToken();
 
         Long currentTimeMillis = System.currentTimeMillis();
@@ -161,7 +161,7 @@ class TokenServiceTest {
                 RefreshToken.builder()
                         .refreshToken(refreshTokenName)
                         .user(user)
-                        .expirationDate(LocalDateTime.now().minusSeconds(2L))
+                        .expirationDateTime(LocalDateTime.now().minusSeconds(2L))
                         .build()).getRefreshToken();
 
         // when // then

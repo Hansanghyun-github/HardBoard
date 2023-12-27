@@ -9,16 +9,17 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "email_numbers")
+@Table(name = "auth_numbers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AuthNumber {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "email_number_id")
+    @Column(name = "auth_number_id")
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "auth_num")
+    @Column(name = "auth_num", nullable = false)
     private String authNum;
 
     @Builder

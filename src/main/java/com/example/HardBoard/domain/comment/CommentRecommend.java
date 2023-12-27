@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "comment_recommend")
+@Table(name = "comment_recommends")
 @ToString
 public class CommentRecommend {
     @Id @GeneratedValue

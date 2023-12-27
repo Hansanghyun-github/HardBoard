@@ -26,10 +26,12 @@ public class Inquiry extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "is_responded")
     private Boolean isResponded;
 
-    private String response; // TODO 처음에는 null로 관리하지 말고 디폴트 값을 넣어줘야 한다
+    private String response;
 
+    @Column(name = "respond_date_time")
     private LocalDateTime respondDateTime;
 
     @Builder

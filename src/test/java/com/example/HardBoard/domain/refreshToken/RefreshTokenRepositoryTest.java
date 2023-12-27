@@ -6,7 +6,6 @@ import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest
 @Transactional
@@ -41,7 +39,7 @@ class RefreshTokenRepositoryTest {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .refreshToken(tokenNum)
-                .expirationDate(dateTime)
+                .expirationDateTime(dateTime)
                 .build();
         refreshTokenRepository.save(refreshToken);
 
@@ -50,7 +48,7 @@ class RefreshTokenRepositoryTest {
 
         // then
         assertThat(token.isPresent()).isTrue();
-        assertThat(token.get().getExpirationDate()).isEqualTo(dateTime);
+        assertThat(token.get().getExpirationDateTime()).isEqualTo(dateTime);
         assertThat(token.get().getRefreshToken()).isEqualTo(tokenNum);
         assertThat(token.get().getUser()).isEqualTo(user);
     }
@@ -70,7 +68,7 @@ class RefreshTokenRepositoryTest {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now()
+                .expirationDateTime(LocalDateTime.now()
                         .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build();
         refreshTokenRepository.save(refreshToken);
@@ -97,7 +95,7 @@ class RefreshTokenRepositoryTest {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now()
+                .expirationDateTime(LocalDateTime.now()
                         .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build();
         refreshTokenRepository.save(refreshToken);
@@ -124,7 +122,7 @@ class RefreshTokenRepositoryTest {
                 RefreshToken.builder()
                         .refreshToken(UUID.randomUUID().toString())
                         .user(user)
-                        .expirationDate(LocalDateTime.now()
+                        .expirationDateTime(LocalDateTime.now()
                                 .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                         .build());
 
@@ -134,7 +132,7 @@ class RefreshTokenRepositoryTest {
 
         // then
         assertThat(findedToken.getRefreshToken()).isEqualTo(token.getRefreshToken());
-        assertThat(findedToken.getExpirationDate()).isEqualTo(token.getExpirationDate());
+        assertThat(findedToken.getExpirationDateTime()).isEqualTo(token.getExpirationDateTime());
         assertThat(findedToken.getUser()).isEqualTo(user);
     }
 
@@ -152,7 +150,7 @@ class RefreshTokenRepositoryTest {
                 RefreshToken.builder()
                         .refreshToken(UUID.randomUUID().toString())
                         .user(user)
-                        .expirationDate(LocalDateTime.now()
+                        .expirationDateTime(LocalDateTime.now()
                                 .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                         .build());
 

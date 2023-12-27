@@ -18,12 +18,12 @@ class RefreshTokenTest {
         RefreshToken token = RefreshToken.builder()
                 .refreshToken(UUID.randomUUID().toString())
                 .user(User.builder().build())
-                .expirationDate(LocalDateTime.now())
+                .expirationDateTime(LocalDateTime.now())
                 .build();
         RefreshToken prevToken = RefreshToken.builder()
                 .refreshToken(token.getRefreshToken())
                 .user(token.getUser())
-                .expirationDate(token.getExpirationDate())
+                .expirationDateTime(token.getExpirationDateTime())
                 .build();
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -32,7 +32,7 @@ class RefreshTokenTest {
 
         // then
         assertThat(token.getRefreshToken()).isNotEqualTo(prevToken.getRefreshToken());
-        assertThat(token.getExpirationDate()).isEqualTo(dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
+        assertThat(token.getExpirationDateTime()).isEqualTo(dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME));
     }
 
     @Test
@@ -41,7 +41,7 @@ class RefreshTokenTest {
         // given
         RefreshToken token = RefreshToken.builder()
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now())
+                .expirationDateTime(LocalDateTime.now())
                 .build();
         LocalDateTime curDateTime = LocalDateTime.now().minusSeconds(10L);
 
@@ -55,7 +55,7 @@ class RefreshTokenTest {
         // given
         RefreshToken token = RefreshToken.builder()
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now())
+                .expirationDateTime(LocalDateTime.now())
                 .build();
         LocalDateTime curDateTime = LocalDateTime.now().plusSeconds(10L);
 

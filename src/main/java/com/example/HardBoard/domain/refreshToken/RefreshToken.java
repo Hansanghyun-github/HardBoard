@@ -25,29 +25,29 @@ public class RefreshToken {
     @Column(name = "refresh_token", nullable = false, unique = true)
     private String refreshToken;
 
-    @Column(name = "expiration_date", nullable = false)
-    private LocalDateTime expirationDate;
+    @Column(name = "expiration_date_time", nullable = false)
+    private LocalDateTime expirationDateTime;
 
     @Builder
-    private RefreshToken(User user, String refreshToken, LocalDateTime expirationDate) {
+    private RefreshToken(User user, String refreshToken, LocalDateTime expirationDateTime) {
         this.user = user;
         this.refreshToken = refreshToken;
-        this.expirationDate = expirationDate;
+        this.expirationDateTime = expirationDateTime;
     }
 
     public static RefreshToken create(User user, LocalDateTime dateTime){
         return RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(dateTime
+                .expirationDateTime(dateTime
                         .plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build();
     }
 
     public void refreshTokenRotation(LocalDateTime dateTime){
         this.refreshToken = UUID.randomUUID().toString();
-        this.expirationDate = dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME);
+        this.expirationDateTime = dateTime.plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME);
     }
 
-    public boolean isExpired(LocalDateTime dateTime){ return this.expirationDate.isBefore(dateTime); }
+    public boolean isExpired(LocalDateTime dateTime){ return this.expirationDateTime.isBefore(dateTime); }
 }

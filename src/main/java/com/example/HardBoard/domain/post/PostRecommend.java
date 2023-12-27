@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "post_recommend",
+        name = "post_recommends",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
 @ToString
 public class PostRecommend {

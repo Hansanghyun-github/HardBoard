@@ -97,7 +97,7 @@ class AuthValidationServiceTest {
         String token = refreshTokenRepository.save(RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME - 1L))
+                .expirationDateTime(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME - 1L))
                 .build()).getRefreshToken();
 
         // when // then
@@ -122,7 +122,7 @@ class AuthValidationServiceTest {
         String token = refreshTokenRepository.save(RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME - 1L))
+                .expirationDateTime(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME - 1L))
                 .build()).getRefreshToken() + "haha";
 
         // when // then
@@ -149,7 +149,7 @@ class AuthValidationServiceTest {
         String token = refreshTokenRepository.save(RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now().minusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                .expirationDateTime(LocalDateTime.now().minusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build()).getRefreshToken();
 
         // when // then

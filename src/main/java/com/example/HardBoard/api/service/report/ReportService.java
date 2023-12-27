@@ -38,6 +38,7 @@ public class ReportService {
         );
     }
 
+    // TODO 두 validate 메서드 동시에 처리
     public void validateTarget(TargetStatus status, Long targetId) {
         if(status == TargetStatus.POST && !postRepository.existsById(targetId))
             throw new IllegalArgumentException("Invalid postId");
@@ -55,7 +56,7 @@ public class ReportService {
         reportRepository.deleteById(reportId);
     }
 
-    public List<ReportResponse> getBlockList(Long userId, int page) {
+    public List<ReportResponse> getBlockList(Long userId, int page) { // TODO BlockService에서 처리
         PageRequest pageRequest = PageRequest.of(page, 20,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return reportRepository.findByUserId(userId, pageRequest)

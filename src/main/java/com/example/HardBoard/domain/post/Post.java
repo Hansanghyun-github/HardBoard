@@ -23,12 +23,6 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    // TODO 추천과 비추천을 통계 쿼리로 계속 유지시킬 수 있나?
-
-/*    private Long recommends;
-
-    private Long unrecommends;*/
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

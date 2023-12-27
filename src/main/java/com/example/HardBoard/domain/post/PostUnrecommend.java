@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
-        name = "post_unrecommend",
+        name = "post_unrecommends",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "post_id"})})
 public class PostUnrecommend {
     @Id @GeneratedValue

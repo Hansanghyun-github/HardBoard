@@ -107,7 +107,7 @@ class AuthServiceTest {
         refreshTokenRepository.save(RefreshToken.builder()
                 .user(user)
                 .refreshToken(UUID.randomUUID().toString())
-                .expirationDate(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                .expirationDateTime(LocalDateTime.now().plusSeconds(JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .build());
 
         Long userId = user.getId();

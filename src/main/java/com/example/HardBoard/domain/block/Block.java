@@ -27,6 +27,7 @@ public class Block {
     @JoinColumn(name = "block_user_id")
     private User blockUser;
 
+    @Column(name = "created_date_time")
     private LocalDateTime createdDateTime;
 
     @Builder

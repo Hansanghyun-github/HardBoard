@@ -74,7 +74,7 @@ public class PublicPostAcceptanceTest {
     Long userId;
     String accessToken;
 
-    @BeforeEach // TODO BeforeAll로 바꿔서 최적화
+    @BeforeEach
     void setAccessToken(){
         user = userRepository.save(
                 User.builder()
@@ -91,8 +91,6 @@ public class PublicPostAcceptanceTest {
                         .withClaim("email", user.getEmail())
                         .sign(Algorithm.HMAC512(JwtProperties.SECRET));
     }
-
-    // TODO @BeforeAll로 미리 100개 정도의 post와 comment를 만들어 놓고, 그걸로 테스트 하자
 
     @Test
     @DisplayName("postId에 해당하는 post와 commentList를 받는다")
