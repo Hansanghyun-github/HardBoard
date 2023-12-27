@@ -41,3 +41,4 @@
 
 ---
 ## 🏗️API 명세서
+https://statuesque-step-7d4.notion.site/API-4adcc08f25d14ae2ba0c5fb12955929d
