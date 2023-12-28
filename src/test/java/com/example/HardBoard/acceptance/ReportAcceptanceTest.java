@@ -105,7 +105,7 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when
-        mockMvc.perform(post("/posts/reports/" + postId)
+        mockMvc.perform(post("/reports/posts/" + postId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -126,7 +126,7 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/posts/reports/" + 1L)
+        mockMvc.perform(post("/reports/posts/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -144,7 +144,7 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/posts/reports/" + 1L)
+        mockMvc.perform(post("/reports/posts/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -185,7 +185,7 @@ public class ReportAcceptanceTest {
         System.out.println("----------------- after flush --------------------");
 
         // when
-        mockMvc.perform(post("/comments/reports/" + commentId)
+        mockMvc.perform(post("/reports/comments/" + commentId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -205,7 +205,7 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/comments/reports/" + 0L)
+        mockMvc.perform(post("/reports/comments/" + 0L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -223,7 +223,7 @@ public class ReportAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/comments/reports/" + 1L)
+        mockMvc.perform(post("/reports/comments/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,

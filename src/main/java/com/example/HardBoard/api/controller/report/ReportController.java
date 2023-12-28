@@ -20,7 +20,7 @@ import java.util.List;
 public class ReportController {
     private final ReportService reportService;
 
-    @PostMapping("/posts/reports/{postId}")
+    @PostMapping("/reports/posts/{postId}")
     public ApiResponse<String> reportPost(
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long postId,
@@ -31,7 +31,7 @@ public class ReportController {
         return ApiResponse.ok("ok");
     } // 신고하고 신고글 안봐도 되서 그냥 String으로 반환 함
 
-    @PostMapping("/comments/reports/{commentId}")
+    @PostMapping("/reports/comments/{commentId}")
     public ApiResponse<String> reportComment(
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId,
