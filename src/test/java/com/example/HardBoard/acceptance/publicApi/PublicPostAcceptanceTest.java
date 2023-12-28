@@ -455,7 +455,7 @@ public class PublicPostAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/users/posts/" + anotherUser.getId()))
+        String content = mockMvc.perform(get("/public/posts/users/" + anotherUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -483,7 +483,7 @@ public class PublicPostAcceptanceTest {
     @DisplayName("userId를 이용해 해당 유저의 PostList를 조회할 때, 올바른 userId를 입력해야 한다")
     void getPostListWithWrongUserId() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/users/posts/" + 0L))
+        mockMvc.perform(get("/public/posts/users/" + 0L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid userId"));
     }
@@ -492,7 +492,7 @@ public class PublicPostAcceptanceTest {
     @DisplayName("userId를 이용해 해당 유저의 PostList를 조회할 때, 올바른 page를 입력해야 한다")
     void getPostListWithUserIdAndWrongPage() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/users/posts/" + 0L + "?page=0"))
+        mockMvc.perform(get("/public/posts/users/" + 0L + "?page=0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("page has to be greater than zero"));
     }
@@ -521,7 +521,7 @@ public class PublicPostAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/users/posts/" + anotherUser.getId()))
+        String content = mockMvc.perform(get("/public/posts/users/" + anotherUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();

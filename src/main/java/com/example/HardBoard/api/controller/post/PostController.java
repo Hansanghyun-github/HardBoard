@@ -45,7 +45,7 @@ public class PostController {
         return ApiResponse.ok("ok");
     }
 
-    @PostMapping("/posts/{postId}")
+    @PutMapping("/posts/{postId}")
     public ApiResponse<PostResponse> editPost(
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long postId,

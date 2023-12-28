@@ -122,7 +122,7 @@ public class PublicCommentAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/comments/post/" + post.getId()))
+        String content = mockMvc.perform(get("/public/comments/posts/" + post.getId()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         ArrayList list = (ArrayList) objectMapper.readValue(content, ApiResponse.class).getData();
@@ -190,7 +190,7 @@ public class PublicCommentAcceptanceTest {
         }
 
         // when
-        String content = mockMvc.perform(get("/public/comments/post/" + post.getId())
+        String content = mockMvc.perform(get("/public/comments/posts/" + post.getId())
                         .header(JwtProperties.HEADER_STRING,
                                 JwtProperties.TOKEN_PREFIX + accessToken))
                 .andExpect(status().isOk())
@@ -216,7 +216,7 @@ public class PublicCommentAcceptanceTest {
     @DisplayName("postId의 commentList를 조회할 때 올바른 postId를 입력해야 한다")
     void getCommentListWithWrongPostId() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/comments/post/" + 0L))
+        mockMvc.perform(get("/public/comments/posts/" + 0L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid postId"));
     }
@@ -225,7 +225,7 @@ public class PublicCommentAcceptanceTest {
     @DisplayName("postId의 commentList를 조회할 때 올바른 page를 입력해야 한다")
     void getCommentListWithPostIdAndWrongPage() throws Exception {
         // when // then
-        mockMvc.perform(get("/public/comments/post/" + 0L + "?page=0"))
+        mockMvc.perform(get("/public/comments/posts/" + 0L + "?page=0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("page has to be greater than zero"));
     }

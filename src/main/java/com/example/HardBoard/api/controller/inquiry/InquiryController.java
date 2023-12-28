@@ -31,7 +31,7 @@ public class InquiryController {
                 .toServiceRequest(principal.getUser())));
     }
 
-    @PostMapping("/inquiries/{inquiryId}")
+    @PutMapping("/inquiries/{inquiryId}")
     public ApiResponse<InquiryResponse> editInquiry(
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long inquiryId,

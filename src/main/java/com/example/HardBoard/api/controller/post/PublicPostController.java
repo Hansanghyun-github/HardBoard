@@ -37,7 +37,7 @@ public class PublicPostController {
                 page - 1));
     }
 
-    @GetMapping("/public/users/posts/{userId}")
+    @GetMapping("/public/posts/users/{userId}")
     public ApiResponse<List<PostResponse>> getPostListOfUser(
             @PathVariable Long userId,
             @RequestParam(name = "page", defaultValue = "1") int page

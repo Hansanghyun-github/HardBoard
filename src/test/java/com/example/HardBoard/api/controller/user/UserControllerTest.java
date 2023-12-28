@@ -64,7 +64,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/users/"+userId+"/nickname")
+        mockMvc.perform(put("/users/"+userId+"/nickname")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("200"))
@@ -81,7 +81,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/users/"+userId+"/nickname")
+        mockMvc.perform(put("/users/"+userId+"/nickname")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("400"))
@@ -99,7 +99,7 @@ class UserControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(post("/users/"+userId+"/password")
+        mockMvc.perform(put("/users/"+userId+"/password")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("200"))
@@ -118,7 +118,7 @@ class UserControllerTest {
                 .build();
         
         // when // then
-        mockMvc.perform(post("/users/"+userId+"/password")
+        mockMvc.perform(put("/users/"+userId+"/password")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value("400"))

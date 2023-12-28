@@ -29,7 +29,7 @@ public class PublicCommentController {
     private final UserService userService;
 
     // 따로 댓글 리스트를 요청할 때 호출 -> 굳이 마지막 페이지 알 필요 없다.
-    @GetMapping("/public/comments/post/{postId}") // mapping 겹치면 안되서 일부러 /post/를 넣었다.
+    @GetMapping("/public/comments/posts/{postId}")
     public ApiResponse<List<CommentResponse>> getCommentListOfPost(
             @AuthenticationPrincipal PrincipalDetails principal, // TODO 여기서 주입하지 말고, 서비스 단에서 확인하자
             @PathVariable Long postId,
