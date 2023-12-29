@@ -2,11 +2,9 @@
 
 `하드보드 - 단단한 게시판`
 
-## ✨ 프로젝트의 목적/목표  
-> 백엔드 개발자에게 가장 기본적인 프로젝트이지만, 깊게 파보자
+## ✨ 프로젝트의 목적
 
-목적: 일반적인 게시판 프로젝트 API 작성 후, 최적화 → 포트폴리오 한 줄 쓰는 것  
-목표: 성능 테스트 후, 쿼리 튜닝/인덱스/코드 개선 등을 통해 최적화 하는 것
+기본적인 게시판 API를 성능 테스트를 통해 최적화 해보는 것
 
 ---
 ## ✔ 주요 기능
@@ -41,4 +39,5 @@
 
 ---
 ## 🏗️API 명세서
-https://statuesque-step-7d4.notion.site/API-4adcc08f25d14ae2ba0c5fb12955929d
+<a href="https://statuesque-step-7d4.notion.site/API-4adcc08f25d14ae2ba0c5fb12955929d" target="_blank">API 명세서</a>
+
