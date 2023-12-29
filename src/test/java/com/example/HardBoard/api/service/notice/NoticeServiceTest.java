@@ -4,7 +4,6 @@ import com.example.HardBoard.api.service.notice.request.NoticeCreateServiceReque
 import com.example.HardBoard.api.service.notice.request.NoticeEditServiceRequest;
 import com.example.HardBoard.api.service.notice.response.NoticeResponse;
 import com.example.HardBoard.domain.notice.NoticeRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -37,7 +35,7 @@ class NoticeServiceTest {
         NoticeResponse notice = noticeService.createNotice(request);
 
         // then
-        assertThat(notice.getId()).isNotNull();
+        assertThat(notice.getNoticeId()).isNotNull();
         assertThat(notice.getTitle()).isEqualTo("title1");
         assertThat(notice.getContents()).isEqualTo("contents1");
     }
@@ -59,10 +57,10 @@ class NoticeServiceTest {
 
 
         // when
-        noticeService.editNotice(notice.getId(), request1);
+        noticeService.editNotice(notice.getNoticeId(), request1);
 
         // then
-        NoticeResponse byId = noticeService.findById(notice.getId());
+        NoticeResponse byId = noticeService.findById(notice.getNoticeId());
         assertThat(byId.getTitle()).isEqualTo("title2");
         assertThat(byId.getContents()).isEqualTo("contents2");
     }
@@ -93,10 +91,10 @@ class NoticeServiceTest {
         NoticeResponse notice = noticeService.createNotice(request);
 
         // when
-        noticeService.deleteNotice(notice.getId());
+        noticeService.deleteNotice(notice.getNoticeId());
 
         // then
-        assertThatThrownBy(() -> noticeService.findById(notice.getId()))
+        assertThatThrownBy(() -> noticeService.findById(notice.getNoticeId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid id");
     }

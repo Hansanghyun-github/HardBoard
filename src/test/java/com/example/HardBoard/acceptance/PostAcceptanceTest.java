@@ -147,7 +147,7 @@ public class PostAcceptanceTest {
                 .build();
 
         // when
-        String content = mockMvc.perform(put("/posts/" + postId)
+        String content = mockMvc.perform(patch("/posts/" + postId)
                         .content(objectMapper.writeValueAsString(editRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -188,7 +188,7 @@ public class PostAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/posts/" + postId)
+        mockMvc.perform(patch("/posts/" + postId)
                         .content(objectMapper.writeValueAsString(editRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -219,7 +219,7 @@ public class PostAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/posts/" + wrongPostId)
+        mockMvc.perform(patch("/posts/" + wrongPostId)
                         .content(objectMapper.writeValueAsString(editRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -257,7 +257,7 @@ public class PostAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/posts/" + postId)
+        mockMvc.perform(patch("/posts/" + postId)
                         .content(objectMapper.writeValueAsString(editRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,

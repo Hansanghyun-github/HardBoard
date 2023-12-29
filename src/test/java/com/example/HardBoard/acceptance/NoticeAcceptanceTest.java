@@ -3,7 +3,6 @@ package com.example.HardBoard.acceptance;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.notice.request.NoticeCreateRequest;
 import com.example.HardBoard.api.controller.notice.request.NoticeEditRequest;
-import com.example.HardBoard.api.service.inquiry.response.InquiryResponse;
 import com.example.HardBoard.api.service.notice.response.NoticeResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.domain.notice.Notice;
@@ -66,7 +65,7 @@ public class NoticeAcceptanceTest {
                         .writeValueAsString(apiResponse.getData()), com.example.HardBoard.api.service.notice.response.NoticeResponse.class);
 
         // then
-        assertThat(noticeRepository.findById(noticeResponse.getId())
+        assertThat(noticeRepository.findById(noticeResponse.getNoticeId())
                 .orElseThrow()).isNotNull()
                 .satisfies(notice -> {
                     assertThat(notice.getTitle()).isEqualTo(title);
@@ -94,7 +93,7 @@ public class NoticeAcceptanceTest {
                 .build();
 
         // when
-        mockMvc.perform(put("/notices/" + noticeId)
+        mockMvc.perform(patch("/notices/" + noticeId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

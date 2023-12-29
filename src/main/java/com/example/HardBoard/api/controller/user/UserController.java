@@ -27,7 +27,7 @@ public class UserController {
         return ApiResponse.ok(userService.findUserById(userId));
     }
 
-    @PutMapping("/users/{userId}/nickname")
+    @PatchMapping("/users/{userId}/nickname")
     public ApiResponse<String> changeNickname(
             @PathVariable Long userId,
             @Valid @RequestBody UserChangeNicknameRequest request
@@ -37,7 +37,7 @@ public class UserController {
         return ApiResponse.ok("ok");
     }
 
-    @PutMapping("/users/{userId}/password")
+    @PatchMapping("/users/{userId}/password")
     public ApiResponse<String> changePassword(
             @PathVariable Long userId,
             @Valid @RequestBody UserChangePasswordRequest request

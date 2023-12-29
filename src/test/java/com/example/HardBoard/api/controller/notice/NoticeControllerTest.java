@@ -88,7 +88,7 @@ class NoticeControllerTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/notices/1")
+        mockMvc.perform(patch("/notices/1")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -106,7 +106,7 @@ class NoticeControllerTest {
 
         // when // then
         mockMvc.perform(
-                        put("/notices/1")
+                        patch("/notices/1")
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

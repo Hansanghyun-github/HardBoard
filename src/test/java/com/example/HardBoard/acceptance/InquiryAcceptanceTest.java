@@ -151,7 +151,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when
-        String content = mockMvc.perform(put("/inquiries/" + inquiryId)
+        String content = mockMvc.perform(patch("/inquiries/" + inquiryId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -180,7 +180,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/inquiries/" + 1L)
+        mockMvc.perform(patch("/inquiries/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -199,7 +199,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/inquiries/" + 1L)
+        mockMvc.perform(patch("/inquiries/" + 1L)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -235,7 +235,7 @@ public class InquiryAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/inquiries/" + inquiryId)
+        mockMvc.perform(patch("/inquiries/" + inquiryId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,

@@ -6,7 +6,6 @@ import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.controller.comment.request.CommentCreateRequest;
 import com.example.HardBoard.api.controller.comment.request.CommentEditRequest;
 import com.example.HardBoard.api.service.comment.response.CommentResponse;
-import com.example.HardBoard.api.service.post.response.PostResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.comment.*;
@@ -113,7 +112,7 @@ public class CommentAcceptanceTest {
         // then
         assertThat(commentResponse.getUserId()).isEqualTo(userId);
         assertThat(commentResponse.getPostId()).isEqualTo(post.getId());
-        assertThat(commentRepository.findById(commentResponse.getId())
+        assertThat(commentRepository.findById(commentResponse.getCommentId())
                 .orElseThrow()).isNotNull()
                 .satisfies(comment -> {
                     assertThat(comment.getContents()).isEqualTo(contents);
@@ -198,7 +197,7 @@ public class CommentAcceptanceTest {
         assertThat(commentResponse.getUserId()).isEqualTo(userId);
         assertThat(commentResponse.getPostId()).isEqualTo(post.getId());
         assertThat(commentResponse.getParentCommentId()).isEqualTo(parent.getId());
-        assertThat(commentRepository.findById(commentResponse.getId())
+        assertThat(commentRepository.findById(commentResponse.getCommentId())
                 .orElseThrow()).isNotNull()
                 .satisfies(comment -> {
                     assertThat(comment.getContents()).isEqualTo(contents);
@@ -252,7 +251,7 @@ public class CommentAcceptanceTest {
         CommentEditRequest request = CommentEditRequest.builder()
                 .contents(editContents)
                 .build();
-        String content = mockMvc.perform(put("/comments/" + prevComment.getId())
+        String content = mockMvc.perform(patch("/comments/" + prevComment.getId())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -264,7 +263,7 @@ public class CommentAcceptanceTest {
                 .writeValueAsString(apiResponse.getData()), CommentResponse.class);
         
         // then
-        assertThat(commentRepository.findById(commentResponse.getId())
+        assertThat(commentRepository.findById(commentResponse.getCommentId())
                 .orElseThrow()).isNotNull()
                 .satisfies(comment -> {
                     assertThat(comment.getContents()).isEqualTo(editContents);
@@ -290,7 +289,7 @@ public class CommentAcceptanceTest {
         CommentEditRequest request = CommentEditRequest.builder()
                 .contents(editContents)
                 .build();
-        mockMvc.perform(put("/comments/" + wrongCommentId)
+        mockMvc.perform(patch("/comments/" + wrongCommentId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -316,7 +315,7 @@ public class CommentAcceptanceTest {
         CommentEditRequest request = CommentEditRequest.builder()
                 .contents(editContents)
                 .build();
-        mockMvc.perform(put("/comments/" + comment.getId())
+        mockMvc.perform(patch("/comments/" + comment.getId())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,
@@ -349,7 +348,7 @@ public class CommentAcceptanceTest {
         CommentEditRequest request = CommentEditRequest.builder()
                 .contents(editContents)
                 .build();
-        mockMvc.perform(put("/comments/" + comment.getId())
+        mockMvc.perform(patch("/comments/" + comment.getId())
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(JwtProperties.HEADER_STRING,

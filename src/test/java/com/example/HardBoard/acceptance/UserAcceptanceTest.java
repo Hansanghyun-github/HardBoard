@@ -98,7 +98,7 @@ public class UserAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/" + userId + "/nickname")
+        mockMvc.perform(patch("/users/" + userId + "/nickname")
                         .header(JwtProperties.HEADER_STRING, accessToken)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -123,7 +123,7 @@ public class UserAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/" + userId + "/nickname")
+        mockMvc.perform(patch("/users/" + userId + "/nickname")
                         .header(JwtProperties.HEADER_STRING, accessToken)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -144,7 +144,7 @@ public class UserAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/" + userId + "/password")
+        mockMvc.perform(patch("/users/" + userId + "/password")
                         .header(JwtProperties.HEADER_STRING, accessToken)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -170,7 +170,7 @@ public class UserAcceptanceTest {
                 .build();
 
         // when // then
-        mockMvc.perform(put("/users/" + userId + "/password")
+        mockMvc.perform(patch("/users/" + userId + "/password")
                         .header(JwtProperties.HEADER_STRING, accessToken)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))

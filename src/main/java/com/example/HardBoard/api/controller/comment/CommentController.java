@@ -33,7 +33,7 @@ public class CommentController {
                 .toServiceRequest(principal.getUser(), postId)));
     }
 
-    @PutMapping("/comments/{commentId}")
+    @PatchMapping("/comments/{commentId}")
     public ApiResponse<CommentResponse> editComment(
             @AuthenticationPrincipal PrincipalDetails principal,
             @PathVariable Long commentId,

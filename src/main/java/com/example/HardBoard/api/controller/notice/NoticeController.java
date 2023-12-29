@@ -25,7 +25,7 @@ public class NoticeController {
         return ApiResponse.ok(noticeService.createNotice(request.toServiceCreate()));
     }
 
-    @PutMapping("/notices/{noticeId}")
+    @PatchMapping("/notices/{noticeId}")
     public ApiResponse<String> editNotice(
             @PathVariable Long noticeId,
             @Valid @RequestBody NoticeEditRequest request
@@ -49,4 +49,6 @@ public class NoticeController {
         if(page <= 0) throw new IllegalArgumentException("page has to be greater than zero");
         return ApiResponse.ok(noticeService.getNoticeList(page - 1));
     }
+    
+    // TODO 공지사항 글 조회 API 추가
 }
