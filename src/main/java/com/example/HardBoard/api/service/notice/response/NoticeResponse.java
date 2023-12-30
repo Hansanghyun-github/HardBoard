@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class NoticeResponse {
-    private Long id;
+    private Long noticeId;
     private String title;
     private String contents;
     private LocalDateTime createdDateTime;
 
     @Builder
-    public NoticeResponse(Long id, String title, String contents, LocalDateTime createdDateTime) {
-        this.id = id;
+    public NoticeResponse(Long noticeId, String title, String contents, LocalDateTime createdDateTime) {
+        this.noticeId = noticeId;
         this.title = title;
         this.contents = contents;
         this.createdDateTime = createdDateTime;
@@ -25,7 +25,7 @@ public class NoticeResponse {
 
     public static NoticeResponse of(Notice notice){
         return NoticeResponse.builder()
-                .id(notice.getId())
+                .noticeId(notice.getId())
                 .title(notice.getTitle())
                 .contents(notice.getContents())
                 .createdDateTime(notice.getCreatedDateTime())

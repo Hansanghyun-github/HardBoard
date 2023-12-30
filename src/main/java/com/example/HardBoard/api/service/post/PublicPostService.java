@@ -6,7 +6,9 @@ import com.example.HardBoard.api.service.user.UserService;
 import com.example.HardBoard.config.auth.PrincipalDetails;
 import com.example.HardBoard.domain.post.Category;
 import com.example.HardBoard.domain.post.PostRepository;
-import com.example.HardBoard.domain.post.querydsl.PublicPostRepository;
+import com.example.HardBoard.domain.post.publicAPI.PublicPostRepository;
+import com.example.HardBoard.domain.post.publicAPI.SearchCriteria;
+import com.example.HardBoard.domain.post.publicAPI.SortCriteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -86,6 +88,31 @@ public class PublicPostService {
     public List<PostResponse> getMonthBestRecommendPostList(PrincipalDetails principal) {
         List<Long> blockList = blockService.getBlockUserIdList(principal);
         return publicPostRepository.findMonthBestRecommendPostList(blockList)
+                .stream().map(post ->
+                        PostResponse.of(
+                                post,
+                                postRecommendService.countPostRecommends(post.getId()),
+                                postUnrecommendService.countPostUnrecommends(post.getId())
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> searchPosts(
+            PrincipalDetails principal,
+            String category,
+            String searchCriteria,
+            String sortCriteria,
+            List<String> keywords,
+            int page) {
+        List<Long> blockList = blockService.getBlockUserIdList(principal);
+        return publicPostRepository
+                .searchPosts(
+                        blockList,
+                        Category.lookup(category),
+                        SearchCriteria.lookup(searchCriteria),
+                        SortCriteria.lookup(sortCriteria),
+                        keywords,
+                        page)
                 .stream().map(post ->
                         PostResponse.of(
                                 post,

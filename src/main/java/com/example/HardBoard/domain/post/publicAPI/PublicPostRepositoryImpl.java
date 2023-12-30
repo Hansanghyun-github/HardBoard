@@ -1,10 +1,9 @@
-package com.example.HardBoard.domain.post.querydsl;
+package com.example.HardBoard.domain.post.publicAPI;
 
 import com.example.HardBoard.domain.post.Category;
 import com.example.HardBoard.domain.post.Post;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -120,6 +119,17 @@ public class PublicPostRepositoryImpl implements PublicPostRepository{
                 .orderBy(postRecommend.count().desc())
                 .limit(20L)
                 .fetch();
+    }
+
+    @Override
+    public List<Post> searchPosts(
+            List<Long> blockList,
+            Category category,
+            SearchCriteria searchCriteria,
+            SortCriteria sortCriteria,
+            List<String> keywords,
+            int page) {
+        return null;
     }
 
     private Predicate categoryEq(Category category) {

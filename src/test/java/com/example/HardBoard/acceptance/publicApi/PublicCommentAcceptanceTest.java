@@ -1,11 +1,9 @@
-package com.example.HardBoard.acceptance.publicApi;
+package com.example.HardBoard.acceptance.publicAPI;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.HardBoard.api.ApiResponse;
 import com.example.HardBoard.api.service.comment.response.CommentResponse;
-import com.example.HardBoard.api.service.post.response.PostCommentResponse;
-import com.example.HardBoard.api.service.post.response.PostResponse;
 import com.example.HardBoard.config.SecurityConfig;
 import com.example.HardBoard.config.auth.JwtProperties;
 import com.example.HardBoard.domain.block.Block;
@@ -18,7 +16,6 @@ import com.example.HardBoard.domain.user.User;
 import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,7 +69,6 @@ public class PublicCommentAcceptanceTest {
     String accessToken;
 
     @BeforeEach
-        // TODO BeforeAll로 바꿔서 최적화
     void setAccessToken(){
         user = userRepository.save(
                 User.builder()

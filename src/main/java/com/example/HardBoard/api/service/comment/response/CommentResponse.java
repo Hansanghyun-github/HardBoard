@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class CommentResponse {
-    private Long id;
+    private Long commentId;
     private String contents;
     private Long parentCommentId;
     private Long postId;
@@ -22,8 +22,8 @@ public class CommentResponse {
     private LocalDateTime createdDateTime;
 
     @Builder
-    public CommentResponse(Long id, String contents, Long parentCommentId, Long postId, Long userId, String nickname, Long recommends, Long unrecommends, LocalDateTime createdDateTime) {
-        this.id = id;
+    public CommentResponse(Long commentId, String contents, Long parentCommentId, Long postId, Long userId, String nickname, Long recommends, Long unrecommends, LocalDateTime createdDateTime) {
+        this.commentId = commentId;
         this.contents = contents;
         this.parentCommentId = parentCommentId;
         this.postId = postId;
@@ -36,7 +36,7 @@ public class CommentResponse {
 
     public static CommentResponse of(Comment comment, long recommends, long unrecommends) {
         return CommentResponse.builder()
-                .id(comment.getId())
+                .commentId(comment.getId())
                 .contents(comment.getContents())
                 .parentCommentId(comment.getParent().getId())
                 .createdDateTime(comment.getCreatedDateTime())

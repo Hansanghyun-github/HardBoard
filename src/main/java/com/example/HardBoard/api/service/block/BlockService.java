@@ -45,7 +45,6 @@ public class BlockService {
         User blockUser = userRepository.findById(blockUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid blockUserId"));
         blockRepository.deleteByUserAndBlockUser(user, blockUser);
-        // TODO delete 할때 해당 객체가 없다면, 내가 원하는 Exception을 지정해 줄 수 있을까?
     }
 
     public List<BlockResponse> getBlockList(Long userId, int page) {

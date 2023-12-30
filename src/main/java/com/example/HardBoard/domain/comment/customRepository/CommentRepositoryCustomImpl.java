@@ -25,7 +25,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
                 select(comment)
                 .from(comment)
                 .where(comment.user.id.notIn(blockUserIdList))
-                .orderBy(comment.createdDateTime.asc()) // TODO pageable을 사용할 수 있을까
+                .orderBy(comment.createdDateTime.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetchResults();

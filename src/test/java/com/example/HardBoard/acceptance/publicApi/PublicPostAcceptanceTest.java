@@ -1,4 +1,4 @@
-package com.example.HardBoard.acceptance.publicApi;
+package com.example.HardBoard.acceptance.publicAPI;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -19,14 +19,12 @@ import com.example.HardBoard.domain.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -421,8 +419,6 @@ public class PublicPostAcceptanceTest {
                 .collect(Collectors.toList());
 
         List<Block> blockList = blockRepository.findByUserId(user.getId());
-        // TODO collection's LAZY loading ?
-        // TODO when LAZY loading is executed ?
 
         // then
         assertThat(collect.size()).isEqualTo(5);
