@@ -34,13 +34,20 @@ public class Comment extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Column(name = "cnt_recommends")
+    private Long cntRecommends;
+
+    @Column(name = "cnt_unrecommends")
+    private Long cntUnrecommends;
+
     @Builder
-    public Comment(Comment parent, String contents, Post post, User user) {
-        this.parent = parent;
+    public Comment(String contents, Post post, User user) {
         this.contents = contents;
         this.post = post;
         this.user = user;
         this.isDeleted = false;
+        this.cntRecommends = 0L;
+        this.cntUnrecommends = 0L;
     }
 
     public void setParent() {
@@ -56,6 +63,32 @@ public class Comment extends BaseEntity {
     }
 
     public void delete() {
+        post.decreaseComment();
         isDeleted = true;
+    }
+
+    public static Comment create(String contents, Post post, User user){
+        post.increaseCntComments();
+        return Comment.builder()
+                .contents(contents)
+                .post(post)
+                .user(user)
+                .build();
+    }
+
+    public void recommend(){
+        cntRecommends++;
+    }
+
+    public void cancelRecommend(){
+        cntRecommends--;
+    }
+
+    public void unrecommend(){
+        cntUnrecommends++;
+    }
+
+    public void cancelUnrecommend(){
+        cntUnrecommends--;
     }
 }

@@ -29,5 +29,13 @@ public class CommentUnrecommend {
         this.user = user;
         this.comment = comment;
     }
+
+    public static CommentUnrecommend create(User user, Comment comment){
+        comment.recommend();
+        return CommentUnrecommend.builder()
+                .user(user)
+                .comment(comment)
+                .build();
+    }
 }
 

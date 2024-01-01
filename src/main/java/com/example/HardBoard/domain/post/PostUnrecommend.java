@@ -32,4 +32,12 @@ public class PostUnrecommend {
         this.user = user;
         this.post = post;
     }
+
+    public static PostUnrecommend create(User user, Post post){
+        post.unrecommend();
+        return PostUnrecommend.builder()
+                .user(user)
+                .post(post)
+                .build();
+    }
 }

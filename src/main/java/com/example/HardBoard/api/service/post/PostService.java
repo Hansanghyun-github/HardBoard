@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.service.post;
 
+import com.example.HardBoard.api.service.comment.CommentService;
 import com.example.HardBoard.api.service.post.request.PostCreateServiceRequest;
 import com.example.HardBoard.api.service.post.request.PostEditServiceRequest;
 import com.example.HardBoard.api.service.post.response.PostResponse;
@@ -20,6 +21,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostRecommendService postRecommendService;
     private final PostUnrecommendService postUnrecommendService;
+    private final CommentService commentService;
 
     public PostResponse createPost(PostCreateServiceRequest request) {
         Post post = postRepository.save(
@@ -27,7 +29,7 @@ public class PostService {
                         request.getContents(),
                         request.getCategory(),
                         request.getUser()));
-        return PostResponse.of(post, 0L, 0L);
+        return PostResponse.of(post);
     } // TODO 자기 자신 post에 추천 막는 기능 추가
 
     public void validatePost(Long postId) {
@@ -50,8 +52,6 @@ public class PostService {
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         post.edit(request.getTitle(), request.getContents());
-        return PostResponse.of(post,
-                postRecommendService.countPostRecommends(request.getPostId()),
-                postUnrecommendService.countPostUnrecommends(request.getPostId()));
+        return PostResponse.of(post);
     }
 }

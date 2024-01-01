@@ -25,11 +25,17 @@ public class PostRecommend {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    // TODO 굳이 글 하나당 추천 한개로 제한할 필요가 있을까? 하루당 추천 제한이면 충분하지 않을까?
-
     @Builder
     public PostRecommend(User user, Post post) {
         this.user = user;
         this.post = post;
+    }
+
+    public static PostRecommend create(User user, Post post){
+        post.recommend();
+        return PostRecommend.builder()
+                .user(user)
+                .post(post)
+                .build();
     }
 }

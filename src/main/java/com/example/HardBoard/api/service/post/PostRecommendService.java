@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.service.post;
 
+import com.example.HardBoard.domain.post.Post;
 import com.example.HardBoard.domain.post.PostRecommend;
 import com.example.HardBoard.domain.post.PostRecommendRepository;
 import com.example.HardBoard.domain.post.PostRepository;
@@ -22,19 +23,24 @@ public class PostRecommendService {
     }
 
     public Long recommendPost(Long postId, User user) {
-        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId)) throw new IllegalArgumentException("Can't duplicate recommend same post");
+        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId))
+            throw new IllegalArgumentException("Can't duplicate recommend same post");
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         postRecommendRepository.save(
-                PostRecommend.builder()
-                        .post(postRepository.findById(postId).orElseThrow(() ->
-                                new IllegalArgumentException("Invalid postId")))
-                        .user(user)
-                        .build());
-        return postRecommendRepository.countByPostId(postId);
+                PostRecommend.create(user, post));
+        return post.getCntRecommends();
     }
 
     public Long cancelRecommendPost(Long postId, User user) {
-        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId) == false) throw new IllegalArgumentException("Didn't recommend it");
+        if(postRecommendRepository.existsByUserIdAndPostId(user.getId(), postId) == false)
+            throw new IllegalArgumentException("Didn't recommend it");
         postRecommendRepository.deleteByUserIdAndPostId(user.getId(), postId);
-        return postRecommendRepository.countByPostId(postId);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        post.cancelRecommend();
+
+        return post.getCntRecommends();
     }
 }

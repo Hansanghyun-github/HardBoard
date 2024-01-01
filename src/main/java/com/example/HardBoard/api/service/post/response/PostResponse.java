@@ -15,6 +15,7 @@ public class PostResponse { // PostList에서 필요한 정보들
     private String contents;
     private Long recommends;
     private Long unrecommends;
+    private Long comments;
     private Category category;
     private Long userId;
     private String nickname;
@@ -22,12 +23,10 @@ public class PostResponse { // PostList에서 필요한 정보들
     private LocalDateTime createdDateTime;
     private LocalDateTime modifiedDateTime;
 
-    // TODO add countComment
-
     @Builder
     public PostResponse(
             Long postId, String title, String contents,
-            Long recommends, Long unrecommends,
+            Long recommends, Long unrecommends, Long comments,
             Category category, Long userId, String nickname,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.postId = postId;
@@ -35,6 +34,7 @@ public class PostResponse { // PostList에서 필요한 정보들
         this.contents = contents;
         this.recommends = recommends;
         this.unrecommends = unrecommends;
+        this.comments = comments;
         this.category = category;
         this.userId = userId;
         this.nickname = nickname;
@@ -42,14 +42,15 @@ public class PostResponse { // PostList에서 필요한 정보들
         this.modifiedDateTime = updatedAt;
     }
 
-    public static PostResponse of(Post post, Long recommends, Long unrecommends){
+    public static PostResponse of(Post post){
         return PostResponse.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .category(post.getCategory())
-                .recommends(recommends)
-                .unrecommends(unrecommends)
+                .recommends(post.getCntRecommends())
+                .unrecommends(post.getCntUnrecommends())
+                .comments(post.getCntComments())
                 .createdAt(post.getCreatedDateTime())
                 .updatedAt(post.getModifiedDateTime())
                 .userId(post.getUser().getId())

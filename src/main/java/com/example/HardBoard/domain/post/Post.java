@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = {"user"})
 public class Post extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "post_id")
@@ -27,12 +28,24 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "cnt_recommends")
+    private Long cntRecommends;
+
+    @Column(name = "cnt_unrecommends")
+    private Long cntUnrecommends;
+
+    @Column(name = "cnt_comments")
+    private Long cntComments;
+
     @Builder
     public Post(String title, String contents, Category category, User user) {
         this.title = title;
         this.contents = contents;
         this.category = category;
         this.user = user;
+        cntRecommends = 0L;
+        cntUnrecommends = 0L;
+        cntComments = 0L;
     }
 
     @Builder
@@ -41,6 +54,9 @@ public class Post extends BaseEntity {
         this.contents = contents;
         this.user = user;
         this.category = Category.Chat;
+        cntRecommends = 0L;
+        cntUnrecommends = 0L;
+        cntComments = 0L;
     }
 
     // TODO 빌더 2개나 만드는게 맞을지
@@ -63,19 +79,31 @@ public class Post extends BaseEntity {
         this.contents=contents;
     }
 
+    public void recommend(){
+        cntRecommends++;
+    }
+
+    public void cancelRecommend(){
+        cntRecommends--;
+    }
+
+    public void unrecommend(){
+        cntUnrecommends++;
+    }
+
+    public void cancelUnrecommend(){
+        cntUnrecommends--;
+    }
+
+    public void increaseCntComments(){
+        cntComments++;
+    }
+
+    public void decreaseComment(){
+        cntComments--;
+    }
+
     public void changeCreatedDateTimeforTest(LocalDateTime createdDateTime){
         this.createdDateTime = createdDateTime;
     } // TODO TODO test 때문에 set 메서드 만듬, 나중에는 없애야 함
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", contents='" + contents + '\'' +
-                ", category=" + category +
-                ", createdDateTime=" + createdDateTime +
-                ", modifiedDateTime=" + modifiedDateTime +
-                '}';
-    }
 }

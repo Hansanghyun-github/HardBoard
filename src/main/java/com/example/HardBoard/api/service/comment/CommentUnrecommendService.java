@@ -1,5 +1,6 @@
 package com.example.HardBoard.api.service.comment;
 
+import com.example.HardBoard.domain.comment.Comment;
 import com.example.HardBoard.domain.comment.CommentRepository;
 import com.example.HardBoard.domain.comment.CommentUnrecommend;
 import com.example.HardBoard.domain.comment.CommentUnrecommendRepository;
@@ -22,18 +23,23 @@ public class CommentUnrecommendService {
 
     public Long unrecommendComment(Long commentId, User user) {
         if(commentUnrecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId)) throw new IllegalArgumentException("Can't duplicate unrecommend same comment");
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid commentId"));
         commentUnrecommendRepository.save(
-                CommentUnrecommend.builder()
-                        .comment(commentRepository.findById(commentId)
-                                        .orElseThrow(() -> new IllegalArgumentException("Invalid commentId")))
-                        .user(user)
-                        .build());
-        return commentUnrecommendRepository.countByCommentId(commentId);
+                CommentUnrecommend.create(user, comment));
+
+        return comment.getCntUnrecommends();
     }
 
     public Long cancelUnrecommendComment(Long commentId, User user) {
         if(commentUnrecommendRepository.existsByUserIdAndCommentId(user.getId(), commentId) == false) throw new IllegalArgumentException("Didn't unrecommend it");
         commentUnrecommendRepository.deleteByUserIdAndCommentId(user.getId(), commentId);
-        return commentUnrecommendRepository.countByCommentId(commentId);
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid commentId"));
+        comment.cancelUnrecommend();
+
+        return comment.getCntUnrecommends();
     }
 }

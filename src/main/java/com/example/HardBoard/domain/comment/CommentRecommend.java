@@ -28,4 +28,12 @@ public class CommentRecommend {
         this.user = user;
         this.comment = comment;
     }
+
+    public static CommentRecommend create(User user, Comment comment){
+        comment.recommend();
+        return CommentRecommend.builder()
+                .user(user)
+                .comment(comment)
+                .build();
+    }
 }

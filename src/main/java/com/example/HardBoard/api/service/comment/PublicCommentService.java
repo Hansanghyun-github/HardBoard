@@ -31,9 +31,7 @@ public class PublicCommentService {
 
         PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
         return commentRepository.findByPostId(postId, blockUserIdList, pageRequest)
-                .map(comment -> CommentResponse.of(comment,
-                        commentRecommendService.countCommentRecommends(comment.getId()),
-                        commentUnrecommendService.countCommentUnrecommends(comment.getId())))
+                .map(comment -> CommentResponse.of(comment))
                 .getContent();
     }
 
@@ -41,9 +39,7 @@ public class PublicCommentService {
         PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE,
                 Sort.by(Sort.Direction.DESC, "createdDateTime"));
         return commentRepository.findByUserId(userId, pageRequest)
-                .map(comment -> CommentResponse.of(comment,
-                        commentRecommendService.countCommentRecommends(comment.getId()),
-                        commentUnrecommendService.countCommentUnrecommends(comment.getId())))
+                .map(comment -> CommentResponse.of(comment))
                 .getContent();
     }
 

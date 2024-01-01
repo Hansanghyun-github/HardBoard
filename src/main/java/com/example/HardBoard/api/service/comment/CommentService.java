@@ -28,12 +28,11 @@ public class CommentService {
 
     public CommentResponse createComment(CommentCreateServiceRequest request) {
         Comment comment = commentRepository.save(
-                Comment.builder()
-                        .contents(request.getContents())
-                        .user(request.getUser())
-                        .post(postRepository.findById(request.getPostId())
-                                .orElseThrow(() -> new IllegalArgumentException("Invalid postId")))
-                        .build());
+                Comment.create(
+                        request.getContents(),
+                        postRepository.findById(request.getPostId())
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid postId")),
+                        request.getUser()));
         // TODO -1이 아니라 다른 걸로 구별해야 함 - 가독성 쓰레기
         if(request.getParentCommentId().equals(-1L)) // TODO separate other method to OOP
             comment.setParent();
@@ -41,9 +40,7 @@ public class CommentService {
                 commentRepository.findById(request.getParentCommentId())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid parent comment id")));
         return CommentResponse.of(
-                comment,
-                0L,
-                0L);
+                comment);
     }
 
     public void validateComment(Long commentId, User user) {
@@ -56,9 +53,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(request.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid commentId"));
         comment.editContents(request.getContents());
-        return CommentResponse.of(comment,
-                commentRecommendService.countCommentRecommends(request.getId()),
-                commentUnrecommendService.countCommentUnrecommends(request.getId()));
+        return CommentResponse.of(comment);
     }
 
     public void deleteComment(Long commentId) {
@@ -67,5 +62,9 @@ public class CommentService {
                 .delete();
         // 댓글은 계층형 구조라, 부모 댓글이 사라지면 안되서 직접 delete하지 않았다.
         // TODO 루트댓글이라면 삭제(하위 댓글 없을 때 -> 동시성 문제), 아니라면 보이지 않게 세팅
+    }
+
+    public Long countCommentsOfPostId(Long postId){
+        return commentRepository.countByPostId(postId);
     }
 }
